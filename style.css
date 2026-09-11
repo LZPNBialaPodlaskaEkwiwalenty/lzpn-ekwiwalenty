@@ -936,6 +936,15 @@ tbody tr:hover{
     color:var(--gold);
 }
 
+.footer-hint{
+
+    display:inline-block;
+    margin-top:10px;
+
+    font-size:.78rem;
+    opacity:.6;
+}
+
 /* =========================
    REFEREE INFO
 ========================= */
@@ -1043,6 +1052,21 @@ tbody tr:hover{
 
     width:100%;
     justify-content:center;
+}
+
+.adblock-hint{
+
+    margin-top:14px;
+
+    font-size:.78rem;
+    text-align:center;
+    opacity:.55;
+    line-height:1.4;
+}
+
+.adblock-hint i{
+
+    margin-right:4px;
 }
 
 .login-mode-toggle{
