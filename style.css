@@ -862,18 +862,19 @@ tbody tr:hover{
 
     .weekdays{
 
-        font-size:.8rem;
+        font-size:.85rem;
     }
 
     .day{
 
-        min-height:70px;
-        padding:8px;
+        min-height:92px;
+        padding:10px;
+        border-radius:14px;
     }
 
     .day-number{
 
-        font-size:.9rem;
+        font-size:1.05rem;
     }
 
     .calendar-match-line:nth-of-type(n+3){
@@ -883,7 +884,7 @@ tbody tr:hover{
 
     .match-counter{
 
-        font-size:.7rem;
+        font-size:.75rem;
     }
 
     th,
@@ -902,12 +903,30 @@ tbody tr:hover{
 
     .calendar-grid{
 
-        gap:4px;
+        gap:6px;
     }
 
     .day{
 
-        min-height:60px;
+        min-height:80px;
+        padding:8px 6px;
+    }
+
+    .day-number{
+
+        font-size:1rem;
+        font-weight:800;
+    }
+
+    .day:active{
+
+        border-color:var(--gold);
+        background:rgba(212,175,55,.1);
+    }
+
+    .weekdays{
+
+        font-size:.75rem;
     }
 
     .topbar-actions{
