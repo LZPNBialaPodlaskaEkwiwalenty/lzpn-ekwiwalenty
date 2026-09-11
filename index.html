@@ -45,9 +45,20 @@
         <h2 id="loginModalTitle">Zaloguj się</h2>
 
         <p class="login-subtitle">
-            Podaj swój login i PIN. Jeśli logujesz się pierwszy raz,
-            konto zostanie utworzone automatycznie.
+            Przy pierwszym logowaniu podaj imię i nazwisko, login oraz PIN -
+            konto zostanie utworzone automatycznie. Przy kolejnych logowaniach
+            wystarczy sam login i PIN.
         </p>
+
+        <div class="form-group">
+            <label>Imię i nazwisko</label>
+            <input
+                type="text"
+                id="loginFullName"
+                placeholder="np. Bartosz Zabielski"
+                autocomplete="name"
+            >
+        </div>
 
         <div class="form-group">
             <label>Login</label>

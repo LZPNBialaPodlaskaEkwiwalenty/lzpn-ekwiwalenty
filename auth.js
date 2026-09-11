@@ -52,6 +52,7 @@ function getLoginEls(){
 
     return {
         modal: document.getElementById("loginModal"),
+        fullNameInput: document.getElementById("loginFullName"),
         usernameInput: document.getElementById("loginUsername"),
         pinInput: document.getElementById("loginPin"),
         submitBtn: document.getElementById("loginSubmitBtn"),
@@ -98,12 +99,18 @@ function setSubmitLoading(loading){
 
 async function handleLoginSubmit(){
 
-    const { usernameInput, pinInput } = getLoginEls();
+    const { fullNameInput, usernameInput, pinInput } = getLoginEls();
 
+    const fullName = fullNameInput.value.trim();
     const username = sanitizeUsername(usernameInput.value);
     const pin = pinInput.value.trim();
 
     clearLoginError();
+
+    if(!fullName || fullName.length < 3){
+        showLoginError("Podaj imię i nazwisko.");
+        return;
+    }
 
     if(!username || username.length < 3){
         showLoginError("Login musi mieć min. 3 znaki (litery/cyfry, bez polskich znaków i spacji).");
@@ -139,7 +146,7 @@ async function handleLoginSubmit(){
 
             await docRef.set({
                 pinHash: pinHash,
-                refereeName: usernameInput.value.trim(),
+                refereeName: fullName,
                 matches: [],
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -206,13 +213,13 @@ async function completeLogin(username){
 
 function showLoginModal(){
 
-    const { modal, usernameInput } = getLoginEls();
+    const { modal, fullNameInput } = getLoginEls();
 
     clearLoginError();
 
     if(modal){
         modal.classList.add("active");
-        setTimeout(()=> usernameInput && usernameInput.focus(), 100);
+        setTimeout(()=> fullNameInput && fullNameInput.focus(), 100);
     }
 }
 
@@ -323,7 +330,7 @@ window.LZPN_AUTH = {
    OBSŁUGA FORMULARZA LOGOWANIA
 ====================================== */
 
-const { submitBtn, pinInput, usernameInput } = getLoginEls();
+const { fullNameInput, submitBtn, pinInput, usernameInput } = getLoginEls();
 
 if(submitBtn){
     submitBtn.addEventListener("click", handleLoginSubmit);
@@ -338,6 +345,12 @@ if(pinInput){
 if(usernameInput){
     usernameInput.addEventListener("keydown", (e)=>{
         if(e.key === "Enter") pinInput.focus();
+    });
+}
+
+if(fullNameInput){
+    fullNameInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") usernameInput.focus();
     });
 }
 
