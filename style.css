@@ -966,6 +966,85 @@ tbody tr:hover{
     font-weight:600;
 }
 
+.user-badge{
+
+    color:var(--gold-light,#e9c65e);
+    font-size:.85rem;
+    opacity:.75;
+}
+
+.logout-btn{
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+/* =========================
+   LOGOWANIE
+========================= */
+
+.login-content{
+
+    max-width:420px;
+    text-align:center;
+}
+
+.login-logo{
+
+    display:flex;
+    justify-content:center;
+    margin-bottom:16px;
+}
+
+.login-logo img{
+
+    width:90px;
+    height:90px;
+    border-radius:50%;
+}
+
+.login-content h2{
+
+    margin-bottom:10px;
+}
+
+.login-subtitle{
+
+    opacity:.75;
+    font-size:.9rem;
+    line-height:1.5;
+    margin-bottom:22px;
+}
+
+.login-content .form-group{
+
+    text-align:left;
+}
+
+.login-error{
+
+    display:none;
+    color:#ff6b6b;
+    background:rgba(255,107,107,.1);
+    border:1px solid rgba(255,107,107,.3);
+    border-radius:10px;
+    padding:10px 14px;
+    margin-bottom:16px;
+    font-size:.9rem;
+}
+
+.login-error.active{
+
+    display:block;
+}
+
+.login-submit{
+
+    width:100%;
+    justify-content:center;
+}
+
 .calendar-matches{
 
     margin-top:6px;

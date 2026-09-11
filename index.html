@@ -24,10 +24,63 @@
 
     <!-- XLSX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- FIREBASE (logowanie i synchronizacja w chmurze) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
 <div class="background-glow"></div>
+
+<!-- EKRAN LOGOWANIA -->
+<div id="loginModal" class="modal active">
+
+    <div class="modal-content glass login-content">
+
+        <div class="login-logo">
+            <img src="logo.png" alt="Logo KS Biała Podlaska">
+        </div>
+
+        <h2 id="loginModalTitle">Zaloguj się</h2>
+
+        <p class="login-subtitle">
+            Podaj swój login i PIN. Jeśli logujesz się pierwszy raz,
+            konto zostanie utworzone automatycznie.
+        </p>
+
+        <div class="form-group">
+            <label>Login</label>
+            <input
+                type="text"
+                id="loginUsername"
+                placeholder="np. bzabielski"
+                autocomplete="username"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>PIN (4-8 cyfr)</label>
+            <input
+                type="password"
+                id="loginPin"
+                placeholder="np. 2468"
+                inputmode="numeric"
+                autocomplete="current-password"
+                maxlength="8"
+            >
+        </div>
+
+        <div id="loginError" class="login-error"></div>
+
+        <button id="loginSubmitBtn" class="gold-btn login-submit">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Zaloguj / Załóż konto
+        </button>
+
+    </div>
+
+</div>
 
 <header class="topbar">
 
@@ -76,8 +129,15 @@
         Sędzia: Nie ustawiono
     </span>
 
+    <span id="currentUserBadge" class="user-badge"></span>
+
     <button id="changeRefereeBtn" class="dark-btn">
         Zmień
+    </button>
+
+    <button id="logoutBtn" class="dark-btn logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Wyloguj
     </button>
 </div>
 
@@ -504,6 +564,7 @@
 
 </div>
 
+<script src="auth.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

@@ -283,25 +283,12 @@ const tableBody =
 
 function loadData(){
 
-    const saved =
-        localStorage.getItem(STORAGE_KEY);
-
-    if(saved){
-
-        matches = JSON.parse(saved);
-
-    }else{
-
-        matches = [];
-    }
+    matches = window.LZPN_AUTH.getMatches();
 }
 
 function saveData(){
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(matches)
-    );
+    window.LZPN_AUTH.saveMatches(matches);
 }
 
 /* ======================================
@@ -1274,9 +1261,7 @@ async function exportPDF(){
         getCurrentMonthMatches();
 
     const referee =
-        localStorage.getItem(
-            "lzpn_referee_name"
-        ) || "—";
+        window.LZPN_AUTH.getRefereeName() || "—";
 
     const total =
         monthMatches.reduce(
@@ -1859,47 +1844,40 @@ document
 );
 
 /* ======================================
-   START
+   START (po zalogowaniu)
 ====================================== */
 
-loadData();
+function startApp(){
 
-initializeSelects();
+    loadData();
 
-renderCalendar();
+    initializeSelects();
 
-renderMatchesTable();
+    renderCalendar();
 
-updateStatistics();
+    renderMatchesTable();
 
-updateAmountPreview();
+    updateStatistics();
 
-showToast(
-    "Aplikacja gotowa"
-);
+    updateAmountPreview();
+
+    loadReferee();
+
+    showToast(
+        "Aplikacja gotowa"
+    );
+}
+
+window.LZPN_AUTH.onReady(startApp);
 
 /* ======================================
    DANE SĘDZIEGO
 ====================================== */
 
-const REFEREE_KEY =
-    "lzpn_referee_name";
-
 function loadReferee(){
 
     const name =
-        localStorage.getItem(
-            REFEREE_KEY
-        );
-
-    if(!name){
-
-        document
-            .getElementById("refereeModal")
-            .classList.add("active");
-
-        return;
-    }
+        window.LZPN_AUTH.getRefereeName();
 
     document
         .getElementById(
@@ -1928,10 +1906,7 @@ function saveReferee(){
         return;
     }
 
-    localStorage.setItem(
-        REFEREE_KEY,
-        name
-    );
+    window.LZPN_AUTH.setRefereeName(name);
 
     document
         .getElementById(
@@ -1972,8 +1947,6 @@ document
 
     }
 );
-
-loadReferee();
 
 /* ======================================
    LISTA DRUŻYN
