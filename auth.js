@@ -833,9 +833,7 @@ async function loadTeamsFromCloud(){
 
         if(!doc.exists){
 
-            const seed = typeof window.LZPN_GET_TEAMS === "function"
-                ? window.LZPN_GET_TEAMS()
-                : [];
+            const seed = window.LZPN_DEFAULT_TEAMS || [];
 
             await docRef.set({ approved: seed, pending: [] });
 
@@ -1076,6 +1074,49 @@ async function openTeamsAdminModal(){
     }
 }
 
+async function restoreDefaultTeams(){
+
+    const defaults = window.LZPN_DEFAULT_TEAMS || [];
+
+    if(defaults.length === 0){
+        alert("Brak wbudowanej listy do przywrócenia.");
+        return;
+    }
+
+    const sure = confirm(
+        `Dodać z powrotem ${defaults.length} wbudowanych drużyn do bazy? Obecne wpisy zostaną zachowane.`
+    );
+
+    if(!sure) return;
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+
+        await docRef.update({
+            approved: firebase.firestore.FieldValue.arrayUnion(...defaults)
+        });
+
+        const doc = await docRef.get();
+        const data = doc.data() || {};
+
+        teamsAdminCache = data.approved || [];
+
+        renderTeamsAdminList(document.getElementById("teamsAdminSearch").value);
+
+        if(typeof window.LZPN_SET_TEAMS === "function"){
+            window.LZPN_SET_TEAMS(teamsAdminCache);
+        }
+
+        showToastSafe("Wbudowana lista przywrócona");
+
+    }catch(err){
+
+        console.error(err);
+        alert("Nie udało się przywrócić listy. Spróbuj ponownie.");
+    }
+}
+
 async function addTeamToDb(){
 
     const input = document.getElementById("teamsAdminNewName");
@@ -1164,6 +1205,11 @@ if(teamsAdminSearchInput){
     teamsAdminSearchInput.addEventListener("input", ()=>{
         renderTeamsAdminList(teamsAdminSearchInput.value);
     });
+}
+
+const restoreDefaultTeamsBtn = document.getElementById("restoreDefaultTeamsBtn");
+if(restoreDefaultTeamsBtn){
+    restoreDefaultTeamsBtn.addEventListener("click", restoreDefaultTeams);
 }
 
 const teamsAdminAddBtn = document.getElementById("teamsAdminAddBtn");

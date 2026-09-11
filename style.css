@@ -1583,6 +1583,17 @@ body.modal-open{
     margin-bottom:10px;
 }
 
+.restore-teams-btn{
+
+    width:100%;
+    justify-content:center;
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    margin-bottom:14px;
+}
+
 .teams-admin-list{
 
     display:flex;

@@ -9,7 +9,7 @@
 ====================================== */
 
 const STORAGE_KEY = "lzpn_biala_podlaska_ekwiwalenty";
-let TEAMS = [
+const DEFAULT_TEAMS = [
     "Orzeł Czemierniki",
     "ŁKS Łazy",
     "Granica Terespol",
@@ -91,6 +91,8 @@ let TEAMS = [
     "Wenus Oszczepalin"
 ];
 
+let TEAMS = DEFAULT_TEAMS.slice();
+
 /* ======================================
    DRUŻYNY Z CHMURY (zgłoszenia zaakceptowane
    przez administratora dołączają tutaj)
@@ -151,6 +153,7 @@ function replaceAllTeams(names){
 window.LZPN_ADD_TEAMS = addExtraTeams;
 window.LZPN_SET_TEAMS = replaceAllTeams;
 window.LZPN_GET_TEAMS = function(){ return TEAMS.slice(); };
+window.LZPN_DEFAULT_TEAMS = DEFAULT_TEAMS.slice();
 
 /* ======================================
    STAWKI
