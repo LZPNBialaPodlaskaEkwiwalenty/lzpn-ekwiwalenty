@@ -1134,21 +1134,23 @@ tbody tr:hover{
 
     .selector-group{
 
+        flex-direction:column;
         flex-wrap:nowrap;
-        gap:6px;
+        align-items:stretch;
+        gap:8px;
         margin-bottom:0;
     }
 
     .selector-box{
 
-        flex:1;
+        width:100%;
         min-width:0;
         gap:3px;
     }
 
     .selector-box label{
 
-        font-size:.6rem;
+        font-size:.65rem;
         padding-left:2px;
         white-space:nowrap;
         overflow:hidden;
@@ -1160,9 +1162,9 @@ tbody tr:hover{
 
         min-width:0;
         width:100%;
-        height:38px;
-        padding:0 4px;
-        font-size:.72rem;
+        height:42px;
+        padding:0 12px;
+        font-size:.9rem;
         overflow:hidden;
         text-overflow:ellipsis;
     }
@@ -1170,17 +1172,12 @@ tbody tr:hover{
 
 @media(max-width:400px){
 
-    .selector-box label{
-
-        display:none;
-    }
-
     #monthSelect,
     #yearSelect{
 
-        height:34px;
-        font-size:.68rem;
-        padding:0 2px;
+        height:40px;
+        font-size:.85rem;
+        padding:0 10px;
     }
 
     .calendar-header button{
