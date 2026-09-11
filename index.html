@@ -496,6 +496,11 @@
 
 <datalist id="teamsList"></datalist>
 
+<button type="button" id="reportMissingTeamBtn" class="report-team-link">
+    <i class="fa-solid fa-circle-plus"></i>
+    Nie widzisz drużyny na liście? Zgłoś ją
+</button>
+
             </div>
 
             <div class="amount-preview">
@@ -633,6 +638,21 @@
                 <i class="fa-solid fa-key"></i>
                 Zmień PIN
             </button>
+
+        </div>
+
+        <div id="adminTeamsSection" class="account-section" style="display:none;">
+
+            <h3>Zgłoszone drużyny (panel administratora)</h3>
+
+            <p class="danger-text">
+                Widoczne tylko na Twoim koncie. Zaakceptowane drużyny pojawią się
+                na liście wyboru u wszystkich sędziów.
+            </p>
+
+            <div id="pendingTeamsList" class="pending-teams-list">
+                <p class="pending-teams-empty">Brak nowych zgłoszeń.</p>
+            </div>
 
         </div>
 

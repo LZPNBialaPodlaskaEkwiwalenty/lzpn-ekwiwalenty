@@ -374,6 +374,8 @@ async function completeLogin(username){
 
     setSubmitLoading(false);
 
+    loadTeamsFromCloud();
+
     if(readyCallback){
         readyCallback();
         readyCallback = null;
@@ -812,3 +814,173 @@ window.LZPN_AUTH = {
         return currentUsername;
     }
 };
+
+/* ======================================
+   DRUŻYNY: ZGŁASZANIE I AKCEPTACJA
+====================================== */
+
+const ADMIN_USERNAME = "bzabielski";
+const TEAMS_DOC_PATH = ["teams", "data"];
+
+async function loadTeamsFromCloud(){
+
+    if(!firebaseReady) return;
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+        const doc = await docRef.get();
+
+        if(!doc.exists){
+
+            await docRef.set({ approved: [], pending: [] });
+
+            if(currentUsername === ADMIN_USERNAME){
+                renderAdminTeamsSection([]);
+            }
+
+            return;
+        }
+
+        const data = doc.data() || {};
+
+        if(typeof window.LZPN_ADD_TEAMS === "function"){
+            window.LZPN_ADD_TEAMS(data.approved || []);
+        }
+
+        if(currentUsername === ADMIN_USERNAME){
+            renderAdminTeamsSection(data.pending || []);
+        }
+
+    }catch(err){
+
+        console.warn("Nie udało się wczytać listy drużyn z chmury.", err);
+    }
+}
+
+async function submitTeamProposal(){
+
+    if(!firebaseReady || !currentUsername){
+        alert("Brak połączenia z serwerem. Spróbuj ponownie później.");
+        return;
+    }
+
+    const name = prompt(
+        "Podaj pełną nazwę drużyny, której brakuje na liście:"
+    );
+
+    if(!name) return;
+
+    const trimmed = name.trim();
+
+    if(trimmed.length < 3){
+        alert("Nazwa drużyny jest za krótka.");
+        return;
+    }
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+
+        await docRef.set({
+            pending: firebase.firestore.FieldValue.arrayUnion({
+                name: trimmed,
+                by: currentUsername,
+                at: Date.now()
+            })
+        }, { merge: true });
+
+        showToastSafe("Zgłoszenie wysłane - czeka na akceptację");
+
+    }catch(err){
+
+        console.error(err);
+        alert("Nie udało się wysłać zgłoszenia. Spróbuj ponownie.");
+    }
+}
+
+const reportMissingTeamBtn = document.getElementById("reportMissingTeamBtn");
+
+if(reportMissingTeamBtn){
+    reportMissingTeamBtn.addEventListener("click", submitTeamProposal);
+}
+
+function renderAdminTeamsSection(pending){
+
+    const section = document.getElementById("adminTeamsSection");
+    const list = document.getElementById("pendingTeamsList");
+
+    if(!section || !list) return;
+
+    section.style.display = "block";
+
+    if(!pending || pending.length === 0){
+
+        list.innerHTML = "<p class=\"pending-teams-empty\">Brak nowych zgłoszeń.</p>";
+        return;
+    }
+
+    list.innerHTML = "";
+
+    pending.forEach((item)=>{
+
+        const row = document.createElement("div");
+        row.className = "pending-team-item";
+
+        const date = item.at
+            ? new Date(item.at).toLocaleDateString("pl-PL")
+            : "";
+
+        row.innerHTML = `
+            <span class="pending-team-name">
+                ${item.name}
+                <span class="pending-team-meta">zgłosił: ${item.by || "?"} ${date ? "- " + date : ""}</span>
+            </span>
+            <span class="pending-team-actions">
+                <button type="button" class="approve-team-btn">Akceptuj</button>
+                <button type="button" class="reject-team-btn">Odrzuć</button>
+            </span>
+        `;
+
+        row.querySelector(".approve-team-btn")
+            .addEventListener("click", ()=> handleTeamDecision(item, true));
+
+        row.querySelector(".reject-team-btn")
+            .addEventListener("click", ()=> handleTeamDecision(item, false));
+
+        list.appendChild(row);
+    });
+}
+
+async function handleTeamDecision(item, approve){
+
+    if(!firebaseReady) return;
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+
+        const updates = {
+            pending: firebase.firestore.FieldValue.arrayRemove(item)
+        };
+
+        if(approve){
+            updates.approved = firebase.firestore.FieldValue.arrayUnion(item.name);
+        }
+
+        await docRef.update(updates);
+
+        if(approve && typeof window.LZPN_ADD_TEAMS === "function"){
+            window.LZPN_ADD_TEAMS([item.name]);
+        }
+
+        showToastSafe(approve ? "Drużyna dodana do listy" : "Zgłoszenie odrzucone");
+
+        loadTeamsFromCloud();
+
+    }catch(err){
+
+        console.error(err);
+        alert("Nie udało się zapisać decyzji. Spróbuj ponownie.");
+    }
+}

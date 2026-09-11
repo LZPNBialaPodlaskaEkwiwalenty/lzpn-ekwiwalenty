@@ -9,7 +9,7 @@
 ====================================== */
 
 const STORAGE_KEY = "lzpn_biala_podlaska_ekwiwalenty";
-const TEAMS = [
+let TEAMS = [
     "Orzeł Czemierniki",
     "ŁKS Łazy",
     "Granica Terespol",
@@ -90,6 +90,56 @@ const TEAMS = [
     "Wisła Puławy",
     "Wenus Oszczepalin"
 ];
+
+/* ======================================
+   DRUŻYNY Z CHMURY (zgłoszenia zaakceptowane
+   przez administratora dołączają tutaj)
+====================================== */
+
+function populateTeamsDatalist(){
+
+    const teamsListEl =
+        document.getElementById("teamsList");
+
+    if(!teamsListEl) return;
+
+    teamsListEl.innerHTML = "";
+
+    TEAMS
+        .slice()
+        .sort()
+        .forEach(team=>{
+
+            const option =
+                document.createElement("option");
+
+            option.value = team;
+
+            teamsListEl.appendChild(option);
+        });
+}
+
+function addExtraTeams(names){
+
+    if(!Array.isArray(names)) return;
+
+    let changed = false;
+
+    names.forEach(name=>{
+
+        if(name && !TEAMS.includes(name)){
+
+            TEAMS.push(name);
+            changed = true;
+        }
+    });
+
+    if(changed){
+        populateTeamsDatalist();
+    }
+}
+
+window.LZPN_ADD_TEAMS = addExtraTeams;
 
 /* ======================================
    STAWKI
@@ -1979,26 +2029,8 @@ const teamsList =
         "teamsList"
     );
 
-if(teamsList){
+populateTeamsDatalist();
 
-    TEAMS
-        .sort()
-        .forEach(team=>{
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value = team;
-
-            teamsList.appendChild(
-                option
-            );
-
-        });
-
-}
 function normalizeText(text){
 
     return text

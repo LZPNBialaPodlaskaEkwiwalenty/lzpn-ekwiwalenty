@@ -1455,6 +1455,92 @@ body.modal-open{
     gap:8px;
 }
 
+.report-team-link{
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    margin-top:8px;
+
+    background:none;
+    color:var(--gold-light,#f0cf66);
+    opacity:.8;
+    font-size:.8rem;
+    text-align:left;
+}
+
+.report-team-link:hover{
+
+    opacity:1;
+    text-decoration:underline;
+}
+
+.pending-teams-empty{
+
+    opacity:.6;
+    font-size:.85rem;
+}
+
+.pending-team-item{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
+    padding:10px 12px;
+    margin-bottom:8px;
+
+    border:1px solid rgba(212,175,55,.25);
+    border-radius:12px;
+
+    background:rgba(255,255,255,.03);
+}
+
+.pending-team-name{
+
+    font-weight:600;
+    font-size:.9rem;
+}
+
+.pending-team-meta{
+
+    display:block;
+    font-size:.72rem;
+    opacity:.6;
+    font-weight:400;
+}
+
+.pending-team-actions{
+
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+}
+
+.pending-team-actions button{
+
+    padding:7px 12px;
+    border-radius:8px;
+    font-size:.75rem;
+    font-weight:700;
+}
+
+.approve-team-btn{
+
+    background:rgba(29,185,84,.15);
+    color:#57ff93;
+    border:1px solid rgba(29,185,84,.4);
+}
+
+.reject-team-btn{
+
+    background:rgba(255,95,87,.12);
+    color:#ff867d;
+    border:1px solid rgba(255,95,87,.4);
+}
+
 .danger-zone .danger-text{
 
     opacity:.75;
