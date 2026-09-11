@@ -1024,6 +1024,7 @@ function confirmImportObsady(){
     }
 
     let imported = 0;
+    const importedTeamNames = [];
 
     checked.forEach(i=>{
 
@@ -1043,8 +1044,14 @@ function confirmImportObsady(){
             settled: false
         });
 
+        importedTeamNames.push(row.homeTeam, row.awayTeam);
+
         imported++;
     });
+
+    if(typeof window.LZPN_ADD_TEAMS_TO_DB === "function"){
+        window.LZPN_ADD_TEAMS_TO_DB(importedTeamNames);
+    }
 
     saveData();
 

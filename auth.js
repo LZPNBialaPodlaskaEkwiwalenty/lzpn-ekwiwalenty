@@ -934,6 +934,63 @@ if(isIOSDevice()){
    PUBLICZNE API DLA script.js
 ====================================== */
 
+async function addNamesToApprovedTeams(names){
+
+    if(!firebaseReady) return [];
+    if(!names || names.length === 0) return [];
+
+    const cleaned = names
+        .map(n => (n || "").trim())
+        .filter(n => n.length > 0);
+
+    if(cleaned.length === 0) return [];
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+        const doc = await docRef.get();
+        const existing = (doc.data() && doc.data().approved) || [];
+
+        const existingLower = new Set(existing.map(n => n.toLowerCase()));
+
+        const trulyNew = [];
+        const seenLower = new Set();
+
+        cleaned.forEach(name=>{
+
+            const lower = name.toLowerCase();
+
+            if(!existingLower.has(lower) && !seenLower.has(lower)){
+                trulyNew.push(name);
+                seenLower.add(lower);
+            }
+        });
+
+        if(trulyNew.length === 0) return [];
+
+        await docRef.set({
+            approved: firebase.firestore.FieldValue.arrayUnion(...trulyNew)
+        }, { merge: true });
+
+        if(typeof window.LZPN_ADD_TEAMS === "function"){
+            window.LZPN_ADD_TEAMS(trulyNew);
+        }
+
+        return trulyNew;
+
+    }catch(err){
+
+        console.warn("Nie udało się dopisać drużyn do bazy.", err);
+        return [];
+    }
+}
+
+async function addTeamsToDbSilently(names){
+    await addNamesToApprovedTeams(names);
+}
+
+window.LZPN_ADD_TEAMS_TO_DB = addTeamsToDbSilently;
+
 window.LZPN_AUTH = {
 
     onReady: function(cb){
@@ -1113,18 +1170,12 @@ async function handleTeamDecision(item, approve){
 
         const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
 
-        const updates = {
+        await docRef.update({
             pending: firebase.firestore.FieldValue.arrayRemove(item)
-        };
+        });
 
         if(approve){
-            updates.approved = firebase.firestore.FieldValue.arrayUnion(item.name);
-        }
-
-        await docRef.update(updates);
-
-        if(approve && typeof window.LZPN_ADD_TEAMS === "function"){
-            window.LZPN_ADD_TEAMS([item.name]);
+            await addNamesToApprovedTeams([item.name]);
         }
 
         showToastSafe(approve ? "Drużyna dodana do listy" : "Zgłoszenie odrzucone");
@@ -1240,12 +1291,9 @@ async function restoreDefaultTeams(){
 
     try{
 
+        await addNamesToApprovedTeams(defaults);
+
         const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
-
-        await docRef.update({
-            approved: firebase.firestore.FieldValue.arrayUnion(...defaults)
-        });
-
         const doc = await docRef.get();
         const data = doc.data() || {};
 
@@ -1276,27 +1324,26 @@ async function addTeamToDb(){
         return;
     }
 
-    if(teamsAdminCache.includes(name)){
+    const nameLower = name.toLowerCase();
+
+    if(teamsAdminCache.some(t => t.toLowerCase() === nameLower)){
         alert("Ta drużyna już jest w bazie.");
         return;
     }
 
     try{
 
-        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+        const added = await addNamesToApprovedTeams([name]);
 
-        await docRef.update({
-            approved: firebase.firestore.FieldValue.arrayUnion(name)
-        });
+        if(added.length === 0){
+            alert("Ta drużyna już jest w bazie.");
+            return;
+        }
 
         teamsAdminCache.push(name);
         input.value = "";
 
         renderTeamsAdminList(document.getElementById("teamsAdminSearch").value);
-
-        if(typeof window.LZPN_ADD_TEAMS === "function"){
-            window.LZPN_ADD_TEAMS([name]);
-        }
 
         showToastSafe("Drużyna dodana");
 
