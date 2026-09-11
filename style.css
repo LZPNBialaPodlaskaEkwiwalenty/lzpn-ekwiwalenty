@@ -478,9 +478,90 @@ select:focus{
     margin-bottom:20px;
 }
 
-.table-wrapper{
+@media(max-width:700px){
 
-    overflow-x:auto;
+    .table-wrapper{
+
+        overflow-x:visible;
+    }
+
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr{
+
+        display:block;
+    }
+
+    thead{
+
+        display:none;
+    }
+
+    tbody tr{
+
+        margin-bottom:14px;
+
+        border:1px solid rgba(212,175,55,.25);
+        border-radius:14px;
+
+        padding:6px 14px;
+
+        background:rgba(255,255,255,.03);
+    }
+
+    tbody tr:hover{
+
+        background:rgba(255,255,255,.03);
+    }
+
+    tbody td{
+
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:14px;
+
+        padding:10px 0;
+
+        border:none;
+        border-bottom:1px solid rgba(255,255,255,.06);
+
+        text-align:right;
+    }
+
+    tbody td:last-child{
+
+        border-bottom:none;
+    }
+
+    tbody td::before{
+
+        content:attr(data-label);
+
+        font-weight:700;
+        font-size:.8rem;
+
+        color:var(--gold-light,#f0cf66);
+        text-align:left;
+
+        flex-shrink:0;
+    }
+
+    tbody td.empty-row{
+
+        display:block;
+        text-align:center;
+        border:none;
+        padding:20px 0;
+    }
+
+    tbody td.empty-row::before{
+
+        content:none;
+    }
 }
 
 table{
@@ -578,6 +659,68 @@ tbody tr:hover{
 .action-btn:hover{
 
     transform:scale(1.05);
+}
+
+/* =========================
+   EKRAN ŁADOWANIA
+========================= */
+
+.app-loading{
+
+    position:fixed;
+    inset:0;
+
+    z-index:99999;
+
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+
+    background:#0a0a0a;
+}
+
+.app-loading.active{
+
+    display:flex;
+}
+
+.app-loading-logo{
+
+    width:70px;
+    height:70px;
+    border-radius:50%;
+
+    animation:appLoadingPulse 1.6s ease-in-out infinite;
+}
+
+.app-loading-spinner{
+
+    width:34px;
+    height:34px;
+
+    border-radius:50%;
+
+    border:3px solid rgba(212,175,55,.2);
+    border-top-color:var(--gold);
+
+    animation:appLoadingSpin .8s linear infinite;
+}
+
+.app-loading p{
+
+    color:var(--muted);
+    font-size:.9rem;
+}
+
+@keyframes appLoadingSpin{
+    to{ transform:rotate(360deg); }
+}
+
+@keyframes appLoadingPulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.6; }
 }
 
 /* =========================
@@ -1053,6 +1196,103 @@ body.modal-open{
     color:var(--gold-light,#e9c65e);
     font-size:.85rem;
     opacity:.75;
+}
+
+.offline-banner{
+
+    display:none;
+
+    width:min(1500px,95%);
+    margin:0 auto 20px auto;
+
+    padding:12px 18px;
+
+    align-items:center;
+    gap:10px;
+
+    border-radius:14px;
+
+    background:rgba(255,159,10,.1);
+    border:1px solid rgba(255,159,10,.35);
+    color:#ffb347;
+
+    font-size:.85rem;
+    line-height:1.4;
+}
+
+.offline-banner.active{
+
+    display:flex;
+}
+
+.install-banner{
+
+    display:none;
+
+    width:min(1500px,95%);
+    margin:0 auto 20px auto;
+
+    padding:12px 18px;
+
+    align-items:center;
+    gap:12px;
+
+    border-radius:14px;
+
+    background:rgba(212,175,55,.08);
+    border:1px solid rgba(212,175,55,.3);
+    color:var(--gold-light,#f0cf66);
+
+    font-size:.85rem;
+    line-height:1.4;
+}
+
+.install-banner.active{
+
+    display:flex;
+}
+
+.install-banner i:first-child{
+
+    flex-shrink:0;
+    font-size:1.1rem;
+}
+
+.install-banner span{
+
+    flex:1;
+}
+
+.install-banner-action{
+
+    flex-shrink:0;
+    padding:8px 14px;
+    font-size:.8rem;
+}
+
+.install-banner-close{
+
+    flex-shrink:0;
+
+    background:none;
+    color:var(--gold-light,#f0cf66);
+    opacity:.7;
+    font-size:1rem;
+    padding:4px;
+}
+
+.install-banner-close:hover{
+
+    opacity:1;
+}
+
+@media(max-width:600px){
+
+    .install-banner,
+    .offline-banner{
+
+        flex-wrap:wrap;
+    }
 }
 
 .logout-btn{

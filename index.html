@@ -41,8 +41,15 @@
 
 <div class="background-glow"></div>
 
+<!-- EKRAN ŁADOWANIA -->
+<div id="appLoadingOverlay" class="app-loading active">
+    <img src="logo.png" alt="Logo KS Biała Podlaska" class="app-loading-logo">
+    <div class="app-loading-spinner"></div>
+    <p>Wczytywanie...</p>
+</div>
+
 <!-- EKRAN LOGOWANIA -->
-<div id="loginModal" class="modal active">
+<div id="loginModal" class="modal">
 
     <div class="modal-content glass login-content">
 
@@ -170,6 +177,24 @@
     <button id="logoutBtn" class="dark-btn logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i>
         Wyloguj
+    </button>
+</div>
+
+<div id="offlineBanner" class="offline-banner">
+    <i class="fa-solid fa-wifi"></i>
+    Brak połączenia z internetem — dane zapisują się tylko na tym urządzeniu i zsynchronizują się automatycznie, gdy internet wróci.
+</div>
+
+<div id="installBanner" class="install-banner">
+    <i class="fa-solid fa-mobile-screen-button"></i>
+    <span id="installBannerText">
+        Dodaj tę stronę do ekranu głównego, żeby korzystać z niej jak z aplikacji.
+    </span>
+    <button id="installBannerActionBtn" class="dark-btn install-banner-action" style="display:none;">
+        Zainstaluj
+    </button>
+    <button id="installBannerCloseBtn" class="install-banner-close" aria-label="Zamknij podpowiedź">
+        <i class="fa-solid fa-xmark"></i>
     </button>
 </div>
 
@@ -386,7 +411,7 @@
                 Dodaj mecz
             </h2>
 
-            <button id="closeModal">
+            <button id="closeModal" aria-label="Zamknij okno dodawania meczu">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -545,7 +570,7 @@
 
         <div class="modal-header">
             <h2>Twoje konto</h2>
-            <button id="closeAccountModal">
+            <button id="closeAccountModal" aria-label="Zamknij okno konta">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>

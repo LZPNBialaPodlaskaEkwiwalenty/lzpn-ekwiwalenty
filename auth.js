@@ -370,6 +370,8 @@ async function completeLogin(username){
     const badge = document.getElementById("currentUserBadge");
     if(badge) badge.textContent = `@${username}`;
 
+    hideLoadingOverlay();
+
     setSubmitLoading(false);
 
     if(readyCallback){
@@ -379,6 +381,8 @@ async function completeLogin(username){
 }
 
 function showLoginModal(){
+
+    hideLoadingOverlay();
 
     const { modal, fullNameInput, usernameInput } = getLoginEls();
 
@@ -391,6 +395,12 @@ function showLoginModal(){
             target && target.focus();
         }, 100);
     }
+}
+
+function hideLoadingOverlay(){
+
+    const el = document.getElementById("appLoadingOverlay");
+    if(el) el.classList.remove("active");
 }
 
 function logout(){
@@ -671,6 +681,102 @@ document
     });
 
 updateBodyScrollLock();
+
+/* ======================================
+   BANER BRAKU INTERNETU
+====================================== */
+
+function updateOfflineBanner(){
+
+    const banner = document.getElementById("offlineBanner");
+    if(!banner) return;
+
+    banner.classList.toggle("active", !navigator.onLine);
+}
+
+window.addEventListener("online", updateOfflineBanner);
+window.addEventListener("offline", updateOfflineBanner);
+
+updateOfflineBanner();
+
+/* ======================================
+   BANER INSTALACJI "JAK APLIKACJA"
+====================================== */
+
+const INSTALL_DISMISS_KEY = "lzpn_install_banner_dismissed";
+
+function isRunningStandalone(){
+
+    return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true
+    );
+}
+
+function isIOSDevice(){
+
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+let deferredInstallPrompt = null;
+
+function maybeShowInstallBanner(){
+
+    const banner = document.getElementById("installBanner");
+    if(!banner) return;
+
+    if(isRunningStandalone()) return;
+    if(localStorage.getItem(INSTALL_DISMISS_KEY)) return;
+
+    if(isIOSDevice()){
+
+        document.getElementById("installBannerText").textContent =
+            "Dodaj tę stronę do ekranu głównego: w Safari stuknij \"Udostępnij\", a potem \"Dodaj do ekranu początkowego\".";
+
+    }
+
+    banner.classList.add("active");
+}
+
+window.addEventListener("beforeinstallprompt", (e)=>{
+
+    e.preventDefault();
+    deferredInstallPrompt = e;
+
+    const actionBtn = document.getElementById("installBannerActionBtn");
+    if(actionBtn) actionBtn.style.display = "inline-flex";
+
+    maybeShowInstallBanner();
+});
+
+const installActionBtn = document.getElementById("installBannerActionBtn");
+
+if(installActionBtn){
+    installActionBtn.addEventListener("click", async ()=>{
+
+        if(!deferredInstallPrompt) return;
+
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+
+        document.getElementById("installBanner").classList.remove("active");
+    });
+}
+
+const installCloseBtn = document.getElementById("installBannerCloseBtn");
+
+if(installCloseBtn){
+    installCloseBtn.addEventListener("click", ()=>{
+
+        localStorage.setItem(INSTALL_DISMISS_KEY, "1");
+        document.getElementById("installBanner").classList.remove("active");
+    });
+}
+
+if(isIOSDevice()){
+    maybeShowInstallBanner();
+}
 
 /* ======================================
    PUBLICZNE API DLA script.js

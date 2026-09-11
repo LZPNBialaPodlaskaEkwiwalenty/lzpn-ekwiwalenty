@@ -591,7 +591,25 @@ function openEditModal(id){
     modal.classList.add("active");
 }
 
-function closeModalWindow(){
+function closeModalWindow(force){
+
+    if(!force){
+
+        const homeVal =
+            document.getElementById("homeTeam").value.trim();
+
+        const awayVal =
+            document.getElementById("awayTeam").value.trim();
+
+        if(homeVal || awayVal){
+
+            const discard = confirm(
+                "Masz niezapisane dane w formularzu. Na pewno zamknąć bez zapisywania?"
+            );
+
+            if(!discard) return;
+        }
+    }
 
     modal.classList.remove("active");
 }
@@ -863,7 +881,7 @@ function saveMatch(event){
     renderMatchesTable();
     updateStatistics();
 
-    closeModalWindow();
+    closeModalWindow(true);
 
     showToast(
         editId
@@ -1050,19 +1068,19 @@ function renderMatchesTable(){
 
         row.innerHTML = `
 
-            <td>${formatDisplayDate(match.date)}</td>
+            <td data-label="Data">${formatDisplayDate(match.date)}</td>
 
-            <td>${match.league}</td>
+            <td data-label="Rozgrywki">${match.league}</td>
 
-            <td>${match.role}</td>
+            <td data-label="Rola">${match.role}</td>
 
-            <td>${match.homeTeam}</td>
+            <td data-label="Gospodarz">${match.homeTeam}</td>
 
-            <td>${match.awayTeam}</td>
+            <td data-label="Goście">${match.awayTeam}</td>
 
-            <td>${match.amount} zł</td>
+            <td data-label="Kwota">${match.amount} zł</td>
 
-            <td>
+            <td data-label="Rozliczone">
 
                 <div class="settled-toggle-table">
 
@@ -1072,6 +1090,7 @@ function renderMatchesTable(){
                             match.settled ? 'active' : ''
                         }"
                         onclick="setMatchSettled(${match.id}, true)"
+                        aria-label="Oznacz jako rozliczone"
                     >
                         TAK
                     </button>
@@ -1082,6 +1101,7 @@ function renderMatchesTable(){
                             !match.settled ? 'active' : ''
                         }"
                         onclick="setMatchSettled(${match.id}, false)"
+                        aria-label="Oznacz jako nierozliczone"
                     >
                         NIE
                     </button>
@@ -1090,22 +1110,24 @@ function renderMatchesTable(){
 
             </td>
 
-            <td>
+            <td data-label="Edytuj">
 
                 <button
                     class="action-btn edit-btn"
                     onclick="openEditModal(${match.id})"
+                    aria-label="Edytuj mecz ${match.homeTeam} - ${match.awayTeam}"
                 >
                     <i class="fa-solid fa-pen"></i>
                 </button>
 
             </td>
 
-            <td>
+            <td data-label="Usuń">
 
                 <button
                     class="action-btn delete-btn"
                     onclick="deleteMatch(${match.id})"
+                    aria-label="Usuń mecz ${match.homeTeam} - ${match.awayTeam}"
                 >
                     <i class="fa-solid fa-trash"></i>
                 </button>
