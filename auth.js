@@ -833,10 +833,15 @@ async function loadTeamsFromCloud(){
 
         if(!doc.exists){
 
-            await docRef.set({ approved: [], pending: [] });
+            const seed = typeof window.LZPN_GET_TEAMS === "function"
+                ? window.LZPN_GET_TEAMS()
+                : [];
+
+            await docRef.set({ approved: seed, pending: [] });
 
             if(currentUsername === ADMIN_USERNAME){
                 renderAdminTeamsSection([]);
+                document.getElementById("adminTeamsPageBtn").style.display = "inline-flex";
             }
 
             return;
@@ -844,12 +849,13 @@ async function loadTeamsFromCloud(){
 
         const data = doc.data() || {};
 
-        if(typeof window.LZPN_ADD_TEAMS === "function"){
-            window.LZPN_ADD_TEAMS(data.approved || []);
+        if(typeof window.LZPN_SET_TEAMS === "function"){
+            window.LZPN_SET_TEAMS(data.approved || []);
         }
 
         if(currentUsername === ADMIN_USERNAME){
             renderAdminTeamsSection(data.pending || []);
+            document.getElementById("adminTeamsPageBtn").style.display = "inline-flex";
         }
 
     }catch(err){
@@ -983,4 +989,191 @@ async function handleTeamDecision(item, approve){
         console.error(err);
         alert("Nie udało się zapisać decyzji. Spróbuj ponownie.");
     }
+}
+
+/* ======================================
+   PEŁNA BAZA DRUŻYN (ADMIN)
+====================================== */
+
+let teamsAdminCache = [];
+
+function sortTeamsPL(list){
+
+    return list.slice().sort((a,b)=> a.localeCompare(b, "pl"));
+}
+
+function renderTeamsAdminList(filterText){
+
+    const listEl = document.getElementById("teamsAdminList");
+    const countEl = document.getElementById("teamsAdminCount");
+
+    if(!listEl) return;
+
+    const filter = (filterText || "").trim().toLowerCase();
+
+    const filtered = filterText
+        ? teamsAdminCache.filter(name => name.toLowerCase().includes(filter))
+        : teamsAdminCache;
+
+    const sorted = sortTeamsPL(filtered);
+
+    countEl.textContent =
+        `${sorted.length} z ${teamsAdminCache.length} drużyn`;
+
+    if(sorted.length === 0){
+        listEl.innerHTML = "<p class=\"pending-teams-empty\">Brak wyników.</p>";
+        return;
+    }
+
+    listEl.innerHTML = "";
+
+    sorted.forEach(name=>{
+
+        const row = document.createElement("div");
+        row.className = "teams-admin-item";
+
+        row.innerHTML = `
+            <span>${name}</span>
+            <button type="button" aria-label="Usuń drużynę ${name}">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        `;
+
+        row.querySelector("button")
+            .addEventListener("click", ()=> deleteTeamFromDb(name));
+
+        listEl.appendChild(row);
+    });
+}
+
+async function openTeamsAdminModal(){
+
+    if(!firebaseReady) return;
+
+    const modal = document.getElementById("teamsAdminModal");
+    if(modal) modal.classList.add("active");
+
+    document.getElementById("teamsAdminSearch").value = "";
+
+    document.getElementById("teamsAdminCount").textContent = "Wczytywanie...";
+    document.getElementById("teamsAdminList").innerHTML = "";
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+        const doc = await docRef.get();
+        const data = doc.data() || {};
+
+        teamsAdminCache = data.approved || [];
+
+        renderTeamsAdminList("");
+
+    }catch(err){
+
+        console.error(err);
+        document.getElementById("teamsAdminCount").textContent =
+            "Błąd wczytywania listy.";
+    }
+}
+
+async function addTeamToDb(){
+
+    const input = document.getElementById("teamsAdminNewName");
+    const name = input.value.trim();
+
+    if(name.length < 3){
+        alert("Nazwa drużyny jest za krótka.");
+        return;
+    }
+
+    if(teamsAdminCache.includes(name)){
+        alert("Ta drużyna już jest w bazie.");
+        return;
+    }
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+
+        await docRef.update({
+            approved: firebase.firestore.FieldValue.arrayUnion(name)
+        });
+
+        teamsAdminCache.push(name);
+        input.value = "";
+
+        renderTeamsAdminList(document.getElementById("teamsAdminSearch").value);
+
+        if(typeof window.LZPN_ADD_TEAMS === "function"){
+            window.LZPN_ADD_TEAMS([name]);
+        }
+
+        showToastSafe("Drużyna dodana");
+
+    }catch(err){
+
+        console.error(err);
+        alert("Nie udało się dodać drużyny. Spróbuj ponownie.");
+    }
+}
+
+async function deleteTeamFromDb(name){
+
+    const sure = confirm(`Usunąć drużynę "${name}" z bazy?`);
+    if(!sure) return;
+
+    try{
+
+        const docRef = db.collection(TEAMS_DOC_PATH[0]).doc(TEAMS_DOC_PATH[1]);
+
+        await docRef.update({
+            approved: firebase.firestore.FieldValue.arrayRemove(name)
+        });
+
+        teamsAdminCache = teamsAdminCache.filter(t => t !== name);
+
+        renderTeamsAdminList(document.getElementById("teamsAdminSearch").value);
+
+        if(typeof window.LZPN_SET_TEAMS === "function"){
+            window.LZPN_SET_TEAMS(teamsAdminCache);
+        }
+
+        showToastSafe("Drużyna usunięta");
+
+    }catch(err){
+
+        console.error(err);
+        alert("Nie udało się usunąć drużyny. Spróbuj ponownie.");
+    }
+}
+
+const adminTeamsPageBtn = document.getElementById("adminTeamsPageBtn");
+if(adminTeamsPageBtn){
+    adminTeamsPageBtn.addEventListener("click", openTeamsAdminModal);
+}
+
+const closeTeamsAdminModalBtn = document.getElementById("closeTeamsAdminModal");
+if(closeTeamsAdminModalBtn){
+    closeTeamsAdminModalBtn.addEventListener("click", ()=>{
+        document.getElementById("teamsAdminModal").classList.remove("active");
+    });
+}
+
+const teamsAdminSearchInput = document.getElementById("teamsAdminSearch");
+if(teamsAdminSearchInput){
+    teamsAdminSearchInput.addEventListener("input", ()=>{
+        renderTeamsAdminList(teamsAdminSearchInput.value);
+    });
+}
+
+const teamsAdminAddBtn = document.getElementById("teamsAdminAddBtn");
+if(teamsAdminAddBtn){
+    teamsAdminAddBtn.addEventListener("click", addTeamToDb);
+}
+
+const teamsAdminNewNameInput = document.getElementById("teamsAdminNewName");
+if(teamsAdminNewNameInput){
+    teamsAdminNewNameInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") addTeamToDb();
+    });
 }

@@ -139,7 +139,18 @@ function addExtraTeams(names){
     }
 }
 
+function replaceAllTeams(names){
+
+    if(!Array.isArray(names)) return;
+
+    TEAMS = names.slice();
+
+    populateTeamsDatalist();
+}
+
 window.LZPN_ADD_TEAMS = addExtraTeams;
+window.LZPN_SET_TEAMS = replaceAllTeams;
+window.LZPN_GET_TEAMS = function(){ return TEAMS.slice(); };
 
 /* ======================================
    STAWKI

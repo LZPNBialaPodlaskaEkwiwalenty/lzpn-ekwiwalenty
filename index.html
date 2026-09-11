@@ -173,6 +173,11 @@
         Konto
     </button>
 
+    <button id="adminTeamsPageBtn" class="dark-btn" style="display:none;">
+        <i class="fa-solid fa-shield-halved"></i>
+        Baza drużyn
+    </button>
+
     <button id="logoutBtn" class="dark-btn logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i>
         Wyloguj
@@ -571,6 +576,45 @@
         <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com?subject=Brakuj%C4%85ca%20dru%C5%BCyna%20w%20aplikacji%20Ekwiwalenty">Zgłoś problem</a>
     </span>
 </footer>
+
+<div id="teamsAdminModal" class="modal">
+
+    <div class="modal-content glass teams-admin-modal">
+
+        <div class="modal-header">
+            <h2>Baza drużyn</h2>
+            <button id="closeTeamsAdminModal" aria-label="Zamknij bazę drużyn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="form-group">
+            <input
+                type="text"
+                id="teamsAdminSearch"
+                placeholder="Szukaj w bazie..."
+            >
+        </div>
+
+        <div class="teams-admin-add-row">
+            <input
+                type="text"
+                id="teamsAdminNewName"
+                placeholder="Nazwa nowej drużyny"
+            >
+            <button id="teamsAdminAddBtn" class="gold-btn">
+                <i class="fa-solid fa-plus"></i>
+                Dodaj
+            </button>
+        </div>
+
+        <p id="teamsAdminCount" class="teams-admin-count"></p>
+
+        <div id="teamsAdminList" class="teams-admin-list"></div>
+
+    </div>
+
+</div>
 
 <div id="refereeModal" class="modal">
 
