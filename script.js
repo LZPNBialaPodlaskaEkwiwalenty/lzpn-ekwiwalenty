@@ -1742,19 +1742,6 @@ function exportExcel(){
 }
 
 /* ======================================
-   ZAPIS MIESIĄCA
-====================================== */
-
-function saveMonthSnapshot(){
-
-    saveData();
-
-    showToast(
-        "Rozliczenie zapisane"
-    );
-}
-
-/* ======================================
    EVENTY
 ====================================== */
 
@@ -1906,13 +1893,6 @@ document
 .addEventListener(
     "click",
     exportExcel
-);
-
-document
-.getElementById("saveMonthBtn")
-.addEventListener(
-    "click",
-    saveMonthSnapshot
 );
 
 /* ======================================
