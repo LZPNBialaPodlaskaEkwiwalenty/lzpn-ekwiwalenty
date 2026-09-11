@@ -4,24 +4,12 @@
    i synchronizacja danych w chmurze (Firebase)
 ====================================== */
 
-const firebaseConfig = {
-    apiKey: "AIzaSyD-dvhk6UvwZ97uMdPPshLz0RO9Z7jGGPU",
-    authDomain: "lzpn-ekwiwalenty.firebaseapp.com",
-    projectId: "lzpn-ekwiwalenty",
-    storageBucket: "lzpn-ekwiwalenty.firebasestorage.app",
-    messagingSenderId: "567125368512",
-    appId: "1:567125368512:web:d94276b2e81c5c1fb69725"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-
 const SESSION_KEY = "lzpn_session_username";
 const LOCAL_CACHE_PREFIX = "lzpn_cache_";
 
 let currentUsername = null;
 let readyCallback = null;
+let currentMode = "login";
 
 /* ======================================
    NARZĘDZIA
@@ -64,7 +52,25 @@ function getLoginEls(){
     };
 }
 
-let currentMode = "login";
+function showLoginError(msg){
+
+    const { errorEl } = getLoginEls();
+
+    if(errorEl){
+        errorEl.textContent = msg;
+        errorEl.classList.add("active");
+    }
+}
+
+function clearLoginError(){
+
+    const { errorEl } = getLoginEls();
+
+    if(errorEl){
+        errorEl.textContent = "";
+        errorEl.classList.remove("active");
+    }
+}
 
 function setMode(mode){
 
@@ -103,26 +109,6 @@ function setMode(mode){
     }
 }
 
-function showLoginError(msg){
-
-    const { errorEl } = getLoginEls();
-
-    if(errorEl){
-        errorEl.textContent = msg;
-        errorEl.classList.add("active");
-    }
-}
-
-function clearLoginError(){
-
-    const { errorEl } = getLoginEls();
-
-    if(errorEl){
-        errorEl.textContent = "";
-        errorEl.classList.remove("active");
-    }
-}
-
 function setSubmitLoading(loading){
 
     const { submitBtn } = getLoginEls();
@@ -148,10 +134,111 @@ function setSubmitLoading(loading){
 }
 
 /* ======================================
+   PODSTAWOWA OBSŁUGA INTERFEJSU
+   (uruchamiana zawsze, niezależnie od tego
+   czy Firebase się połączy)
+====================================== */
+
+const {
+    fullNameInput, submitBtn, pinInput, usernameInput,
+    loginModeBtn, registerModeBtn
+} = getLoginEls();
+
+if(pinInput){
+    pinInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") handleLoginSubmit();
+    });
+}
+
+if(usernameInput){
+    usernameInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") pinInput.focus();
+    });
+}
+
+if(fullNameInput){
+    fullNameInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") usernameInput.focus();
+    });
+}
+
+if(loginModeBtn){
+    loginModeBtn.addEventListener("click", ()=> setMode("login"));
+}
+
+if(registerModeBtn){
+    registerModeBtn.addEventListener("click", ()=> setMode("register"));
+}
+
+if(submitBtn){
+    submitBtn.addEventListener("click", handleLoginSubmit);
+}
+
+setMode("login");
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+if(logoutBtn){
+    logoutBtn.addEventListener("click", ()=>{
+
+        if(confirm("Czy na pewno chcesz się wylogować?")){
+            logout();
+        }
+    });
+}
+
+/* ======================================
+   POŁĄCZENIE Z FIREBASE
+   (osobno, żeby jego ewentualna awaria
+   nie blokowała reszty interfejsu powyżej)
+====================================== */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyD-dvhk6UvwZ97uMdPPshLz0RO9Z7jGGPU",
+    authDomain: "lzpn-ekwiwalenty.firebaseapp.com",
+    projectId: "lzpn-ekwiwalenty",
+    storageBucket: "lzpn-ekwiwalenty.firebasestorage.app",
+    messagingSenderId: "567125368512",
+    appId: "1:567125368512:web:d94276b2e81c5c1fb69725"
+};
+
+let db = null;
+let firebaseReady = false;
+
+try{
+
+    if(typeof firebase === "undefined"){
+        throw new Error("Firebase SDK nie został wczytany (zablokowany skrypt?).");
+    }
+
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebaseReady = true;
+
+}catch(err){
+
+    console.error("Nie udało się zainicjować Firebase:", err);
+    firebaseReady = false;
+
+    showLoginError(
+        "Nie można połączyć się z serwerem logowania w tej przeglądarce. " +
+        "Wyłącz blokowanie reklam/skryptów dla tej strony (może blokować firebasejs.com / gstatic.com) " +
+        "albo spróbuj w innej przeglądarce."
+    );
+
+    if(submitBtn) submitBtn.disabled = true;
+}
+
+/* ======================================
    LOGOWANIE / REJESTRACJA
 ====================================== */
 
 async function handleLoginSubmit(){
+
+    if(!firebaseReady){
+        showLoginError("Brak połączenia z serwerem logowania. Odśwież stronę lub spróbuj innej przeglądarki.");
+        return;
+    }
 
     const { fullNameInput, usernameInput, pinInput } = getLoginEls();
 
@@ -238,6 +325,10 @@ async function completeLogin(username){
     let data = {};
 
     try{
+
+        if(!firebaseReady){
+            throw new Error("Firebase niedostępny");
+        }
 
         const doc = await db.collection("users").doc(username).get();
         data = doc.data() || {};
@@ -328,6 +419,8 @@ async function syncMatchesToCloud(matches){
         JSON.stringify(matches)
     );
 
+    if(!firebaseReady) return;
+
     clearTimeout(syncTimeout);
 
     syncTimeout = setTimeout(async ()=>{
@@ -348,7 +441,7 @@ async function syncMatchesToCloud(matches){
 
 async function syncRefereeNameToCloud(name){
 
-    if(!currentUsername) return;
+    if(!currentUsername || !firebaseReady) return;
 
     try{
 
@@ -396,55 +489,3 @@ window.LZPN_AUTH = {
         return currentUsername;
     }
 };
-
-/* ======================================
-   OBSŁUGA FORMULARZA LOGOWANIA
-====================================== */
-
-const {
-    fullNameInput, submitBtn, pinInput, usernameInput,
-    loginModeBtn, registerModeBtn
-} = getLoginEls();
-
-if(submitBtn){
-    submitBtn.addEventListener("click", handleLoginSubmit);
-}
-
-if(pinInput){
-    pinInput.addEventListener("keydown", (e)=>{
-        if(e.key === "Enter") handleLoginSubmit();
-    });
-}
-
-if(usernameInput){
-    usernameInput.addEventListener("keydown", (e)=>{
-        if(e.key === "Enter") pinInput.focus();
-    });
-}
-
-if(fullNameInput){
-    fullNameInput.addEventListener("keydown", (e)=>{
-        if(e.key === "Enter") usernameInput.focus();
-    });
-}
-
-if(loginModeBtn){
-    loginModeBtn.addEventListener("click", ()=> setMode("login"));
-}
-
-if(registerModeBtn){
-    registerModeBtn.addEventListener("click", ()=> setMode("register"));
-}
-
-setMode("login");
-
-const logoutBtn = document.getElementById("logoutBtn");
-
-if(logoutBtn){
-    logoutBtn.addEventListener("click", ()=>{
-
-        if(confirm("Czy na pewno chcesz się wylogować?")){
-            logout();
-        }
-    });
-}
