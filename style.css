@@ -1148,6 +1148,18 @@ tbody tr:hover{
     opacity:.6;
 }
 
+.footer-hint a{
+
+    color:var(--gold-light,#f0cf66);
+    font-weight:600;
+    text-decoration:underline;
+}
+
+.footer-hint a:hover{
+
+    opacity:.85;
+}
+
 /* =========================
    BLOKADA SCROLLA TŁA
    PRZY OTWARTYM MODALU
@@ -1810,6 +1822,7 @@ body.modal-open{
 
 .topbar-links{
     display:flex;
+    flex-wrap:wrap;
     gap:12px;
     margin:0 20px;
 }
