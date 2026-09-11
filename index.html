@@ -44,13 +44,20 @@
 
         <h2 id="loginModalTitle">Zaloguj się</h2>
 
-        <p class="login-subtitle">
-            Przy pierwszym logowaniu podaj imię i nazwisko, login oraz PIN -
-            konto zostanie utworzone automatycznie. Przy kolejnych logowaniach
-            wystarczy sam login i PIN.
+        <div class="login-mode-toggle">
+            <button type="button" id="loginModeBtn" class="toggle-btn mode-btn active">
+                Mam konto
+            </button>
+            <button type="button" id="registerModeBtn" class="toggle-btn mode-btn">
+                Zakładam konto
+            </button>
+        </div>
+
+        <p id="loginSubtitle" class="login-subtitle">
+            Podaj swój login i PIN.
         </p>
 
-        <div class="form-group">
+        <div class="form-group" id="fullNameGroup" style="display:none;">
             <label>Imię i nazwisko</label>
             <input
                 type="text"
@@ -86,7 +93,7 @@
 
         <button id="loginSubmitBtn" class="gold-btn login-submit">
             <i class="fa-solid fa-right-to-bracket"></i>
-            Zaloguj / Załóż konto
+            Zaloguj
         </button>
 
     </div>

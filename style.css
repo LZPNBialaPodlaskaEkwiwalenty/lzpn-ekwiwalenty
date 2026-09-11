@@ -1045,6 +1045,28 @@ tbody tr:hover{
     justify-content:center;
 }
 
+.login-mode-toggle{
+
+    display:flex;
+    gap:10px;
+
+    margin-bottom:18px;
+}
+
+.mode-btn{
+
+    padding:11px;
+}
+
+.mode-btn.active{
+
+    background:rgba(212,175,55,.14);
+    color:var(--gold-light,#f0cf66);
+    border-color:rgba(212,175,55,.5);
+
+    box-shadow:0 0 18px rgba(212,175,55,.12);
+}
+
 .calendar-matches{
 
     margin-top:6px;

@@ -52,12 +52,55 @@ function getLoginEls(){
 
     return {
         modal: document.getElementById("loginModal"),
+        fullNameGroup: document.getElementById("fullNameGroup"),
         fullNameInput: document.getElementById("loginFullName"),
         usernameInput: document.getElementById("loginUsername"),
         pinInput: document.getElementById("loginPin"),
         submitBtn: document.getElementById("loginSubmitBtn"),
-        errorEl: document.getElementById("loginError")
+        errorEl: document.getElementById("loginError"),
+        subtitleEl: document.getElementById("loginSubtitle"),
+        loginModeBtn: document.getElementById("loginModeBtn"),
+        registerModeBtn: document.getElementById("registerModeBtn")
     };
+}
+
+let currentMode = "login";
+
+function setMode(mode){
+
+    currentMode = mode;
+
+    const {
+        fullNameGroup, subtitleEl, loginModeBtn,
+        registerModeBtn, submitBtn
+    } = getLoginEls();
+
+    clearLoginError();
+
+    if(mode === "register"){
+
+        fullNameGroup.style.display = "block";
+        subtitleEl.textContent =
+            "Podaj imię i nazwisko, login oraz PIN, żeby założyć nowe konto.";
+
+        loginModeBtn.classList.remove("active");
+        registerModeBtn.classList.add("active");
+
+        submitBtn.innerHTML =
+            "<i class=\"fa-solid fa-user-plus\"></i> Załóż konto";
+
+    }else{
+
+        fullNameGroup.style.display = "none";
+        subtitleEl.textContent =
+            "Podaj swój login i PIN.";
+
+        registerModeBtn.classList.remove("active");
+        loginModeBtn.classList.add("active");
+
+        submitBtn.innerHTML =
+            "<i class=\"fa-solid fa-right-to-bracket\"></i> Zaloguj";
+    }
 }
 
 function showLoginError(msg){
@@ -88,9 +131,20 @@ function setSubmitLoading(loading){
 
     submitBtn.disabled = loading;
 
-    submitBtn.innerHTML = loading
-        ? "Proszę czekać..."
-        : "<i class=\"fa-solid fa-right-to-bracket\"></i> Zaloguj / Załóż konto";
+    if(loading){
+
+        submitBtn.innerHTML = "Proszę czekać...";
+
+    }else if(currentMode === "register"){
+
+        submitBtn.innerHTML =
+            "<i class=\"fa-solid fa-user-plus\"></i> Załóż konto";
+
+    }else{
+
+        submitBtn.innerHTML =
+            "<i class=\"fa-solid fa-right-to-bracket\"></i> Zaloguj";
+    }
 }
 
 /* ======================================
@@ -107,11 +161,6 @@ async function handleLoginSubmit(){
 
     clearLoginError();
 
-    if(!fullName || fullName.length < 3){
-        showLoginError("Podaj imię i nazwisko.");
-        return;
-    }
-
     if(!username || username.length < 3){
         showLoginError("Login musi mieć min. 3 znaki (litery/cyfry, bez polskich znaków i spacji).");
         return;
@@ -119,6 +168,11 @@ async function handleLoginSubmit(){
 
     if(!/^\d{4,8}$/.test(pin)){
         showLoginError("PIN musi się składać z 4 do 8 cyfr.");
+        return;
+    }
+
+    if(currentMode === "register" && (!fullName || fullName.length < 3)){
+        showLoginError("Podaj imię i nazwisko.");
         return;
     }
 
@@ -131,7 +185,30 @@ async function handleLoginSubmit(){
         const docRef = db.collection("users").doc(username);
         const doc = await docRef.get();
 
-        if(doc.exists){
+        if(currentMode === "register"){
+
+            if(doc.exists){
+
+                showLoginError("Ten login jest już zajęty. Przełącz się na \"Mam konto\", żeby się zalogować.");
+                setSubmitLoading(false);
+                return;
+            }
+
+            await docRef.set({
+                pinHash: pinHash,
+                refereeName: fullName,
+                matches: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+        }else{
+
+            if(!doc.exists){
+
+                showLoginError("Nie ma takiego konta. Przełącz się na \"Zakładam konto\", żeby je utworzyć.");
+                setSubmitLoading(false);
+                return;
+            }
 
             const data = doc.data();
 
@@ -141,15 +218,6 @@ async function handleLoginSubmit(){
                 setSubmitLoading(false);
                 return;
             }
-
-        }else{
-
-            await docRef.set({
-                pinHash: pinHash,
-                refereeName: fullName,
-                matches: [],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
         }
 
         localStorage.setItem(SESSION_KEY, username);
@@ -213,13 +281,16 @@ async function completeLogin(username){
 
 function showLoginModal(){
 
-    const { modal, fullNameInput } = getLoginEls();
+    const { modal, fullNameInput, usernameInput } = getLoginEls();
 
     clearLoginError();
 
     if(modal){
         modal.classList.add("active");
-        setTimeout(()=> fullNameInput && fullNameInput.focus(), 100);
+        setTimeout(()=>{
+            const target = currentMode === "register" ? fullNameInput : usernameInput;
+            target && target.focus();
+        }, 100);
     }
 }
 
@@ -330,7 +401,10 @@ window.LZPN_AUTH = {
    OBSŁUGA FORMULARZA LOGOWANIA
 ====================================== */
 
-const { fullNameInput, submitBtn, pinInput, usernameInput } = getLoginEls();
+const {
+    fullNameInput, submitBtn, pinInput, usernameInput,
+    loginModeBtn, registerModeBtn
+} = getLoginEls();
 
 if(submitBtn){
     submitBtn.addEventListener("click", handleLoginSubmit);
@@ -353,6 +427,16 @@ if(fullNameInput){
         if(e.key === "Enter") usernameInput.focus();
     });
 }
+
+if(loginModeBtn){
+    loginModeBtn.addEventListener("click", ()=> setMode("login"));
+}
+
+if(registerModeBtn){
+    registerModeBtn.addEventListener("click", ()=> setMode("register"));
+}
+
+setMode("login");
 
 const logoutBtn = document.getElementById("logoutBtn");
 
