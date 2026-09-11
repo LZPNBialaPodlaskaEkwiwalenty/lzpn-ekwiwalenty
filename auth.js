@@ -4,16 +4,22 @@
    i synchronizacja danych w chmurze (Firebase)
 ====================================== */
 
-const SESSION_KEY = "lzpn_session_username";
 const LOCAL_CACHE_PREFIX = "lzpn_cache_";
+const EMAIL_DOMAIN = "lzpn-ekwiwalenty.local";
 
 let currentUsername = null;
+let currentUserUid = null;
 let readyCallback = null;
 let currentMode = "login";
+let handlingExplicitAuth = false;
 
 /* ======================================
    NARZĘDZIA
 ====================================== */
+
+function usernameToEmail(username){
+    return username + "@" + EMAIL_DOMAIN;
+}
 
 async function hashPin(pin, username){
 
@@ -211,6 +217,7 @@ const firebaseConfig = {
 };
 
 let db = null;
+let auth = null;
 let firebaseReady = false;
 
 try{
@@ -221,7 +228,19 @@ try{
 
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
+    auth = firebase.auth();
     firebaseReady = true;
+
+    auth.onAuthStateChanged(async (user)=>{
+
+        if(handlingExplicitAuth) return;
+
+        if(user){
+            await completeLogin(user);
+        }else{
+            showLoginModal();
+        }
+    });
 
 }catch(err){
 
@@ -235,6 +254,9 @@ try{
     );
 
     if(submitBtn) submitBtn.disabled = true;
+
+    hideLoadingOverlay();
+    showLoginModal();
 }
 
 /* ======================================
@@ -261,88 +283,191 @@ async function handleLoginSubmit(){
         return;
     }
 
-    if(!/^\d{4,8}$/.test(pin)){
-        showLoginError("PIN musi się składać z 4 do 8 cyfr.");
-        return;
-    }
+    if(currentMode === "register"){
 
-    if(currentMode === "register" && (!fullName || fullName.length < 3)){
-        showLoginError("Podaj imię i nazwisko.");
-        return;
+        if(!/^\d{4,8}$/.test(pin)){
+            showLoginError("PIN musi się składać z 4 do 8 cyfr.");
+            return;
+        }
+
+        if(!fullName || fullName.length < 3){
+            showLoginError("Podaj imię i nazwisko.");
+            return;
+        }
+
+    }else{
+
+        if(!/^\d{6,8}$/.test(pin)){
+            showLoginError("PIN musi się składać z 6 do 8 cyfr.");
+            return;
+        }
     }
 
     setSubmitLoading(true);
+    handlingExplicitAuth = true;
+
+    const email = usernameToEmail(username);
 
     try{
 
-        const pinHash = await hashPin(pin, username);
-
-        const docRef = db.collection("users").doc(username);
-        const doc = await docRef.get();
-
         if(currentMode === "register"){
 
-            if(doc.exists){
+            let migratedMatches = null;
+            let migratedRefereeName = null;
+            let oldDocRef = null;
 
-                showLoginError("Ten login jest już zajęty. Przełącz się na \"Mam konto\", żeby się zalogować.");
+            try{
+
+                oldDocRef = db.collection("users").doc(username);
+                const oldDoc = await oldDocRef.get();
+
+                if(oldDoc.exists && oldDoc.data().pinHash){
+
+                    const oldHash = await hashPin(pin, username);
+
+                    if(oldDoc.data().pinHash === oldHash){
+
+                        migratedMatches = oldDoc.data().matches || [];
+                        migratedRefereeName = oldDoc.data().refereeName || fullName;
+
+                    }else{
+
+                        showLoginError("Ten login już istnieje ze starszej wersji logowania - podany PIN się nie zgadza. Wpisz swój dotychczasowy PIN, żeby bezpiecznie przenieść konto.");
+                        setSubmitLoading(false);
+                        handlingExplicitAuth = false;
+                        return;
+                    }
+                }
+
+            }catch(e){
+                console.warn("Nie udało się sprawdzić starego konta.", e);
+            }
+
+            let finalPin = pin;
+
+            if(migratedMatches !== null && finalPin.length < 6){
+
+                const newPin = prompt(
+                    "Twoje dotychczasowe konto zostało znalezione, ale ten PIN jest za krótki dla nowego, bezpieczniejszego logowania (min. 6 cyfr). Podaj nowy PIN (6-8 cyfr), którego chcesz używać od teraz:"
+                );
+
+                if(!newPin || !/^\d{6,8}$/.test(newPin)){
+                    showLoginError("Migracja przerwana - nowy PIN musi mieć 6-8 cyfr.");
+                    setSubmitLoading(false);
+                    handlingExplicitAuth = false;
+                    return;
+                }
+
+                finalPin = newPin;
+
+            }else if(migratedMatches === null && finalPin.length < 6){
+
+                showLoginError("PIN musi się składać z 6 do 8 cyfr.");
                 setSubmitLoading(false);
+                handlingExplicitAuth = false;
                 return;
             }
 
-            await docRef.set({
-                pinHash: pinHash,
-                refereeName: fullName,
-                matches: [],
+            let cred;
+
+            try{
+
+                cred = await auth.createUserWithEmailAndPassword(email, finalPin);
+
+            }catch(err){
+
+                if(err.code === "auth/email-already-in-use"){
+                    showLoginError("Ten login jest już zajęty. Przełącz się na \"Mam konto\", żeby się zalogować.");
+                }else if(err.code === "auth/weak-password"){
+                    showLoginError("PIN jest za krótki (min. 6 cyfr).");
+                }else{
+                    showLoginError("Błąd połączenia z serwerem. Spróbuj ponownie.");
+                }
+
+                setSubmitLoading(false);
+                handlingExplicitAuth = false;
+                return;
+            }
+
+            await db.collection("users").doc(cred.user.uid).set({
+                username: username,
+                refereeName: migratedRefereeName || fullName,
+                matches: migratedMatches || [],
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
+            if(migratedMatches !== null && oldDocRef){
+
+                try{
+                    await oldDocRef.delete();
+                }catch(e){
+                    console.warn("Nie udało się usunąć starego konta po migracji.", e);
+                }
+            }
+
+            await completeLogin(cred.user);
+
         }else{
 
-            if(!doc.exists){
+            try{
 
-                showLoginError("Nie ma takiego konta. Przełącz się na \"Zakładam konto\", żeby je utworzyć.");
+                const cred = await auth.signInWithEmailAndPassword(email, pin);
+                await completeLogin(cred.user);
+
+            }catch(err){
+
+                if(
+                    err.code === "auth/user-not-found" ||
+                    err.code === "auth/wrong-password" ||
+                    err.code === "auth/invalid-credential"
+                ){
+
+                    let legacyExists = false;
+
+                    try{
+                        const legacyDoc = await db.collection("users").doc(username).get();
+                        legacyExists = legacyDoc.exists && !!legacyDoc.data().pinHash;
+                    }catch(e){}
+
+                    if(legacyExists){
+                        showLoginError("To konto działa jeszcze na starym systemie logowania. Przełącz się na \"Zakładam konto\" i zaloguj się tym samym loginem i PIN-em, żeby bezpiecznie przenieść dane.");
+                    }else{
+                        showLoginError("Nie ma takiego konta lub PIN jest nieprawidłowy.");
+                    }
+
+                }else{
+                    showLoginError("Błąd połączenia z serwerem. Spróbuj ponownie.");
+                }
+
                 setSubmitLoading(false);
-                return;
-            }
-
-            const data = doc.data();
-
-            if(data.pinHash !== pinHash){
-
-                showLoginError("Nieprawidłowy PIN dla tego loginu.");
-                setSubmitLoading(false);
-                return;
             }
         }
-
-        localStorage.setItem(SESSION_KEY, username);
-        currentUsername = username;
-
-        await completeLogin(username);
 
     }catch(err){
 
         console.error(err);
         showLoginError("Błąd połączenia z serwerem. Sprawdź internet i spróbuj ponownie.");
         setSubmitLoading(false);
+
+    }finally{
+
+        handlingExplicitAuth = false;
     }
 }
 
-async function completeLogin(username){
+async function completeLogin(user){
+
+    currentUserUid = user.uid;
 
     let data = {};
 
     try{
 
-        if(!firebaseReady){
-            throw new Error("Firebase niedostępny");
-        }
-
-        const doc = await db.collection("users").doc(username).get();
+        const doc = await db.collection("users").doc(user.uid).get();
         data = doc.data() || {};
 
         localStorage.setItem(
-            LOCAL_CACHE_PREFIX + username,
+            LOCAL_CACHE_PREFIX + user.uid,
             JSON.stringify(data.matches || [])
         );
 
@@ -350,16 +475,17 @@ async function completeLogin(username){
 
         console.warn("Nie udało się pobrać danych z chmury, próbuję z pamięci lokalnej.", err);
 
-        const cached = localStorage.getItem(LOCAL_CACHE_PREFIX + username);
+        const cached = localStorage.getItem(LOCAL_CACHE_PREFIX + user.uid);
 
         data = {
-            matches: cached ? JSON.parse(cached) : [],
-            refereeName: username
+            matches: cached ? JSON.parse(cached) : []
         };
     }
 
+    currentUsername = data.username || "";
+
     window.LZPN_MATCHES_CACHE = data.matches || [];
-    window.LZPN_REFEREE_NAME = data.refereeName || username;
+    window.LZPN_REFEREE_NAME = data.refereeName || currentUsername || "Sędzia";
 
     const { modal } = getLoginEls();
     if(modal) modal.classList.remove("active");
@@ -368,7 +494,7 @@ async function completeLogin(username){
     if(nameDisplay) nameDisplay.textContent = `Sędzia: ${window.LZPN_REFEREE_NAME}`;
 
     const badge = document.getElementById("currentUserBadge");
-    if(badge) badge.textContent = `@${username}`;
+    if(badge) badge.textContent = `@${currentUsername}`;
 
     hideLoadingOverlay();
 
@@ -405,23 +531,15 @@ function hideLoadingOverlay(){
     if(el) el.classList.remove("active");
 }
 
-function logout(){
+async function logout(){
 
-    localStorage.removeItem(SESSION_KEY);
-    window.location.reload();
-}
-
-async function trySessionRestore(){
-
-    const saved = localStorage.getItem(SESSION_KEY);
-
-    if(!saved){
-        showLoginModal();
-        return;
+    try{
+        if(auth) await auth.signOut();
+    }catch(e){
+        console.warn(e);
     }
 
-    currentUsername = saved;
-    await completeLogin(saved);
+    window.location.reload();
 }
 
 /* ======================================
@@ -432,10 +550,10 @@ let syncTimeout = null;
 
 async function syncMatchesToCloud(matches){
 
-    if(!currentUsername) return;
+    if(!currentUserUid) return;
 
     localStorage.setItem(
-        LOCAL_CACHE_PREFIX + currentUsername,
+        LOCAL_CACHE_PREFIX + currentUserUid,
         JSON.stringify(matches)
     );
 
@@ -448,7 +566,7 @@ async function syncMatchesToCloud(matches){
         try{
 
             await db.collection("users")
-                .doc(currentUsername)
+                .doc(currentUserUid)
                 .update({ matches: matches });
 
         }catch(err){
@@ -461,12 +579,12 @@ async function syncMatchesToCloud(matches){
 
 async function syncRefereeNameToCloud(name){
 
-    if(!currentUsername || !firebaseReady) return;
+    if(!currentUserUid || !firebaseReady) return;
 
     try{
 
         await db.collection("users")
-            .doc(currentUsername)
+            .doc(currentUserUid)
             .update({ refereeName: name });
 
     }catch(err){
@@ -516,7 +634,9 @@ async function handleChangePin(){
 
     clearFieldError(pinChangeError);
 
-    if(!firebaseReady || !currentUsername){
+    const user = auth ? auth.currentUser : null;
+
+    if(!firebaseReady || !user){
         showFieldError(pinChangeError, "Brak połączenia z serwerem.");
         return;
     }
@@ -525,8 +645,8 @@ async function handleChangePin(){
     const newPin = newPinInput.value.trim();
     const newPinConfirm = newPinConfirmInput.value.trim();
 
-    if(!/^\d{4,8}$/.test(newPin)){
-        showFieldError(pinChangeError, "Nowy PIN musi mieć 4-8 cyfr.");
+    if(!/^\d{6,8}$/.test(newPin)){
+        showFieldError(pinChangeError, "Nowy PIN musi mieć 6-8 cyfr.");
         return;
     }
 
@@ -540,22 +660,11 @@ async function handleChangePin(){
 
     try{
 
-        const docRef = db.collection("users").doc(currentUsername);
-        const doc = await docRef.get();
-        const data = doc.data() || {};
+        const email = usernameToEmail(currentUsername);
+        const cred = firebase.auth.EmailAuthProvider.credential(email, currentPin);
 
-        const currentHash = await hashPin(currentPin, currentUsername);
-
-        if(data.pinHash !== currentHash){
-            showFieldError(pinChangeError, "Aktualny PIN jest nieprawidłowy.");
-            changePinBtn.disabled = false;
-            changePinBtn.innerHTML = "<i class=\"fa-solid fa-key\"></i> Zmień PIN";
-            return;
-        }
-
-        const newHash = await hashPin(newPin, currentUsername);
-
-        await docRef.update({ pinHash: newHash });
+        await user.reauthenticateWithCredential(cred);
+        await user.updatePassword(newPin);
 
         currentPinInput.value = "";
         newPinInput.value = "";
@@ -566,7 +675,12 @@ async function handleChangePin(){
     }catch(err){
 
         console.error(err);
-        showFieldError(pinChangeError, "Błąd połączenia. Spróbuj ponownie.");
+
+        if(err.code === "auth/wrong-password" || err.code === "auth/invalid-credential"){
+            showFieldError(pinChangeError, "Aktualny PIN jest nieprawidłowy.");
+        }else{
+            showFieldError(pinChangeError, "Błąd połączenia. Spróbuj ponownie.");
+        }
 
     }finally{
 
@@ -583,15 +697,17 @@ async function handleDeleteAccount(){
 
     clearFieldError(deleteAccountError);
 
-    if(!firebaseReady || !currentUsername){
+    const user = auth ? auth.currentUser : null;
+
+    if(!firebaseReady || !user){
         showFieldError(deleteAccountError, "Brak połączenia z serwerem.");
         return;
     }
 
     const pin = deleteAccountPinInput.value.trim();
 
-    if(!/^\d{4,8}$/.test(pin)){
-        showFieldError(deleteAccountError, "Podaj swój PIN (4-8 cyfr), żeby potwierdzić.");
+    if(!pin){
+        showFieldError(deleteAccountError, "Podaj swój PIN, żeby potwierdzić.");
         return;
     }
 
@@ -606,30 +722,28 @@ async function handleDeleteAccount(){
 
     try{
 
-        const docRef = db.collection("users").doc(currentUsername);
-        const doc = await docRef.get();
-        const data = doc.data() || {};
+        const email = usernameToEmail(currentUsername);
+        const cred = firebase.auth.EmailAuthProvider.credential(email, pin);
 
-        const hash = await hashPin(pin, currentUsername);
+        await user.reauthenticateWithCredential(cred);
 
-        if(data.pinHash !== hash){
-            showFieldError(deleteAccountError, "Nieprawidłowy PIN.");
-            deleteAccountBtn.disabled = false;
-            deleteAccountBtn.innerHTML = "<i class=\"fa-solid fa-trash\"></i> Usuń konto na zawsze";
-            return;
-        }
+        await db.collection("users").doc(user.uid).delete();
+        await user.delete();
 
-        await docRef.delete();
-
-        localStorage.removeItem(SESSION_KEY);
-        localStorage.removeItem(LOCAL_CACHE_PREFIX + currentUsername);
+        localStorage.removeItem(LOCAL_CACHE_PREFIX + user.uid);
 
         window.location.reload();
 
     }catch(err){
 
         console.error(err);
-        showFieldError(deleteAccountError, "Błąd połączenia. Spróbuj ponownie.");
+
+        if(err.code === "auth/wrong-password" || err.code === "auth/invalid-credential"){
+            showFieldError(deleteAccountError, "Nieprawidłowy PIN.");
+        }else{
+            showFieldError(deleteAccountError, "Błąd połączenia. Spróbuj ponownie.");
+        }
+
         deleteAccountBtn.disabled = false;
         deleteAccountBtn.innerHTML = "<i class=\"fa-solid fa-trash\"></i> Usuń konto na zawsze";
     }
@@ -788,7 +902,6 @@ window.LZPN_AUTH = {
 
     onReady: function(cb){
         readyCallback = cb;
-        trySessionRestore();
     },
 
     getMatches: function(){

@@ -36,6 +36,7 @@
     <!-- FIREBASE (logowanie i synchronizacja w chmurze) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -93,7 +94,7 @@
         </div>
 
         <div class="form-group">
-            <label>PIN (4-8 cyfr)</label>
+            <label>PIN (6-8 cyfr)</label>
             <input
                 type="password"
                 id="loginPin"
@@ -672,7 +673,7 @@
             </div>
 
             <div class="form-group">
-                <label>Nowy PIN (4-8 cyfr)</label>
+                <label>Nowy PIN (6-8 cyfr)</label>
                 <input type="password" id="newPinInput" inputmode="numeric" maxlength="8" placeholder="np. 1357">
             </div>
 
