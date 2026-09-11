@@ -722,7 +722,7 @@ function renderDayMatchesList(date){
 
     list.innerHTML = "";
 
-    dayMatches.forEach(match=>{
+    dayMatches.forEach((match, index)=>{
 
         const card =
             document.createElement("div");
@@ -774,6 +774,24 @@ function renderDayMatchesList(date){
             <div class="day-match-actions">
 
                 <button
+                    class="action-btn move-btn"
+                    onclick="moveMatchInDay(${match.id}, -1)"
+                    ${index === 0 ? "disabled" : ""}
+                    aria-label="Przenieś wyżej"
+                >
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+
+                <button
+                    class="action-btn move-btn"
+                    onclick="moveMatchInDay(${match.id}, 1)"
+                    ${index === dayMatches.length - 1 ? "disabled" : ""}
+                    aria-label="Przenieś niżej"
+                >
+                    <i class="fa-solid fa-arrow-down"></i>
+                </button>
+
+                <button
                     class="action-btn edit-btn"
                     onclick="editMatchFromDay(${match.id})"
                 >
@@ -797,6 +815,37 @@ function renderDayMatchesList(date){
 
     });
 
+}
+
+function moveMatchInDay(id, direction){
+
+    const date = selectedDayDate;
+
+    const dayMatches =
+        matches.filter(m => m.date === date);
+
+    const posInDay =
+        dayMatches.findIndex(m => m.id === id);
+
+    if(posInDay === -1) return;
+
+    const targetPosInDay = posInDay + direction;
+
+    if(targetPosInDay < 0 || targetPosInDay >= dayMatches.length) return;
+
+    const idA = dayMatches[posInDay].id;
+    const idB = dayMatches[targetPosInDay].id;
+
+    const globalIndexA = matches.findIndex(m => m.id === idA);
+    const globalIndexB = matches.findIndex(m => m.id === idB);
+
+    [matches[globalIndexA], matches[globalIndexB]] =
+        [matches[globalIndexB], matches[globalIndexA]];
+
+    saveData();
+
+    renderDayMatchesList(date);
+    renderCalendar();
 }
 
 function addMatchFromDay(){

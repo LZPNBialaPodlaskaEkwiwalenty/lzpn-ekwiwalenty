@@ -1954,6 +1954,24 @@ body.modal-open{
     font-weight:600;
 }
 
+.day-match-actions .move-btn{
+
+    padding:8px 11px;
+
+    background:#181818;
+    color:var(--gold-light,#f0cf66);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.day-match-actions .move-btn:hover:not(:disabled){
+    border-color:var(--gold);
+}
+
+.day-match-actions .move-btn:disabled{
+    opacity:.3;
+    cursor:not-allowed;
+}
+
 .day-modal-content h2{
     color:var(--gold);
     margin-bottom:18px;
