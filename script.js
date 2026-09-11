@@ -1,0 +1,2101 @@
+/* ======================================
+   LZPN BIAŁA PODLASKA - EKWIWALENTY
+   SCRIPT.JS
+   CZĘŚĆ 1
+====================================== */
+
+/* ======================================
+   LOCAL STORAGE
+====================================== */
+
+const STORAGE_KEY = "lzpn_biala_podlaska_ekwiwalenty";
+const TEAMS = [
+    "Orzeł Czemierniki",
+    "ŁKS Łazy",
+    "Granica Terespol",
+    "Lewart Lubartów",
+    "Absolwent Domaszewnica",
+    "Agere Sportivo Łuków",
+    "AP Bronowice Lublin",
+    "AP Ulan-Majorat",
+    "Armaty Stoczek Łukowski",
+    "Avia Świdnik",
+    "Avia II Świdnik",
+    "Az-Bud Komarówka Podlaska",
+    "BKS Lublin",
+    "Bizon Jeleniec",
+    "Bug Hanna",
+    "Champion Biała Podlaska",
+    "Chełmianka Chełm",
+    "Dąb Dębowa Kłoda",
+    "Dwernicki Stoczek Łukowski",
+    "Dwójka Międzyrzec Podlaski",
+    "Eko Różanka",
+    "FA Orzeł Czemierniki",
+    "Gaudium Zamość",
+    "GLZS Wodnik Siemień",
+    "Górnik Łęczna S.A.",
+    "Grom Kąkolewnica",
+    "Granit Bychawa",
+    "Gryf Gmina Zamość",
+    "Hetman Zamość",
+    "Huragan Międzyrzec Podlaski",
+    "Janovia Janów Podlaski",
+    "Janowianka Janów Lubelski",
+    "KS AR-TIG Huta Dąbrowa",
+    "KS Drelów",
+    "KS Kamionka",
+    "KS Lublinianka",
+    "KS Twierdza Kobylany",
+    "Krzna Rzeczyca",
+    "Kujawiak Stanin",
+    "Lesovia Trzebieszów",
+    "LKS Milanów",
+    "Lobos FA Biała Podlaska",
+    "Lutnia Piszczac",
+    "ŁSR Amplus Łuków",
+    "Młodzieżówka Radzyń Podlaski",
+    "MOSiR Lubartów",
+    "Motor Lublin S.A.",
+    "Motor II Lublin S.A.",
+    "Niwa Łomazy",
+    "Olimpia Jabłoń",
+    "Olimpia Okrzeja",
+    "Opolanin Opole Lubelskie",
+    "Orkan Wojcieszków",
+    "Orlęta Łuków",
+    "Orlęta Radzyń Podlaski",
+    "Orlik Lubartów",
+    "Perełki Puławy",
+    "Podlasie Biała Podlaska",
+    "Pogoń 96 Łaszczówka",
+    "Północ Lublin",
+    "Powiślak Końskowola",
+    "Ruch Ryki",
+    "Sławin Lublin",
+    "Sokół Adamów",
+    "Stal Poniatowa",
+    "Sygnał Lublin",
+    "Świdniczanka Świdnik",
+    "Tomasovia Tomaszów Lubelski",
+    "Tur Milejów",
+    "Tytan Wisznice",
+    "UKS Jedynka Terespol",
+    "Unia Krzywda",
+    "Victoria Łukowa",
+    "Victoria Parczew",
+    "Vrotcovia Lublin",
+    "Wiara Łęczna",
+    "Widok SP 51 Lublin",
+    "Wisła Puławy",
+    "Wenus Oszczepalin"
+];
+
+/* ======================================
+   STAWKI
+====================================== */
+
+const RATES = {
+
+    "3 Liga": {
+    "Sędzia główny": 0,
+    "Asystent": 452
+},
+
+    "4 Liga": {
+        "Sędzia główny": 348,
+        "Asystent": 247
+    },
+
+    "Klasa okręgowa": {
+        "Sędzia główny": 286,
+        "Asystent": 218
+    },
+
+    "Klasa A": {
+        "Sędzia główny": 222,
+        "Asystent": 160
+    },
+
+    "Klasa B": {
+        "Sędzia główny": 198,
+        "Asystent": 136
+    },
+
+    "Wojewódzka: Junior starszy": {
+        "Sędzia główny": 213,
+        "Asystent": 155
+    },
+
+    "Wojewódzka: Junior młodszy": {
+        "Sędzia główny": 198,
+        "Asystent": 146
+    },
+
+    "Okręgowa: Junior starszy": {
+        "Sędzia główny": 165,
+        "Asystent": 111
+    },
+
+    "Okręgowa: Junior młodszy": {
+        "Sędzia główny": 150,
+        "Asystent": 101
+    },
+
+    "Wojewódzka: Trampkarz": {
+        "Sędzia główny": 140,
+        "Asystent": 90
+    },
+
+    "Wojewódzka: Młodzik": {
+        "Sędzia główny": 140,
+        "Asystent": 90
+    },
+
+    "Okręgowa: Trampkarz": {
+        "Sędzia główny": 130,
+        "Asystent": 80
+    },
+
+    "Okręgowa: Młodzik": {
+        "Sędzia główny": 130,
+        "Asystent": 80
+    },
+
+    "Sparingi: 4 liga": {
+        "Sędzia główny": 136,
+        "Asystent": 111
+    },
+
+    "Sparingi: Niższe klasy": {
+        "Sędzia główny": 108,
+        "Asystent": 90
+    },
+
+    "Baraże: Klasa okręgowa": {
+        "Sędzia główny": 222,
+        "Asystent": 160
+    },
+
+    "Baraże: Klasa A": {
+        "Sędzia główny": 198,
+        "Asystent": 136
+    }
+
+};
+
+/* ======================================
+   MIESIĄCE
+====================================== */
+
+const MONTHS = [
+
+    "Styczeń",
+    "Luty",
+    "Marzec",
+    "Kwiecień",
+    "Maj",
+    "Czerwiec",
+
+    "Lipiec",
+    "Sierpień",
+    "Wrzesień",
+
+    "Październik",
+    "Listopad",
+    "Grudzień"
+
+];
+
+/* ======================================
+   DANE APLIKACJI
+====================================== */
+
+let matches = [];
+
+let currentDate = new Date();
+
+let currentMonth = currentDate.getMonth();
+
+let currentYear = currentDate.getFullYear();
+
+if(currentYear < 2026){
+    currentYear = 2026;
+}
+
+/* ======================================
+   ELEMENTY DOM
+====================================== */
+
+const calendarGrid =
+    document.getElementById("calendarGrid");
+
+const monthSelect =
+    document.getElementById("monthSelect");
+
+const yearSelect =
+    document.getElementById("yearSelect");
+
+const prevMonth =
+    document.getElementById("prevMonth");
+
+const nextMonth =
+    document.getElementById("nextMonth");
+
+const modal =
+    document.getElementById("matchModal");
+
+const closeModal =
+    document.getElementById("closeModal");
+
+const dayModal =
+    document.getElementById("dayModal");
+
+let selectedDayDate = null;
+
+const matchForm =
+    document.getElementById("matchForm");
+
+const leagueSelect =
+    document.getElementById("league");
+
+const roleSelect =
+    document.getElementById("role");
+
+const calculatedAmount =
+    document.getElementById("calculatedAmount");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const filterLeague =
+    document.getElementById("filterLeague");
+
+const filterRole =
+    document.getElementById("filterRole");
+
+const tableBody =
+    document.getElementById("matchesTableBody");
+
+/* ======================================
+   LOCAL STORAGE
+====================================== */
+
+function loadData(){
+
+    const saved =
+        localStorage.getItem(STORAGE_KEY);
+
+    if(saved){
+
+        matches = JSON.parse(saved);
+
+    }else{
+
+        matches = [];
+    }
+}
+
+function saveData(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(matches)
+    );
+}
+
+/* ======================================
+   SELECTY
+====================================== */
+
+function initializeSelects(){
+
+    monthSelect.innerHTML = "";
+
+    MONTHS.forEach((month,index)=>{
+
+        const option =
+            document.createElement("option");
+
+        option.value = index;
+        option.textContent = month;
+
+        monthSelect.appendChild(option);
+
+    });
+
+    monthSelect.value =
+        currentMonth;
+
+    yearSelect.innerHTML = "";
+
+    for(let year = 2026; year <= 2100; year++){
+
+        const option =
+            document.createElement("option");
+
+        option.value = year;
+        option.textContent = year;
+
+        yearSelect.appendChild(option);
+    }
+
+    yearSelect.value =
+        currentYear;
+
+    leagueSelect.innerHTML = "";
+
+    filterLeague.innerHTML =
+        '<option value="">Wszystkie rozgrywki</option>';
+
+    Object.keys(RATES).forEach(league=>{
+
+        const option =
+            document.createElement("option");
+
+        option.value = league;
+        option.textContent = league;
+
+        leagueSelect.appendChild(
+            option.cloneNode(true)
+        );
+
+        filterLeague.appendChild(option);
+
+    });
+
+}
+
+/* ======================================
+   KALENDARZ
+====================================== */
+
+function renderCalendar(){
+
+    calendarGrid.innerHTML = "";
+
+    const firstDay =
+        new Date(
+            currentYear,
+            currentMonth,
+            1
+        );
+
+    const lastDay =
+        new Date(
+            currentYear,
+            currentMonth + 1,
+            0
+        );
+
+    let startDay =
+        firstDay.getDay();
+
+    if(startDay === 0){
+        startDay = 7;
+    }
+
+    for(let i = 1; i < startDay; i++){
+
+        const empty =
+            document.createElement("div");
+
+        empty.className = "day";
+
+        empty.style.visibility = "hidden";
+
+        calendarGrid.appendChild(empty);
+    }
+
+    for(let day = 1;
+        day <= lastDay.getDate();
+        day++){
+
+        const dayElement =
+            document.createElement("div");
+
+        dayElement.classList.add("day");
+
+        const fullDate =
+            formatDate(
+                currentYear,
+                currentMonth + 1,
+                day
+            );
+
+        const dayMatches =
+    matches.filter(
+        match =>
+            match.date === fullDate
+    );
+
+const matchesCount =
+    dayMatches.length;
+
+        if(matchesCount > 0){
+
+            dayElement.classList.add(
+                "has-match"
+            );
+        }
+
+        const MAX_PREVIEW =
+            3;
+
+        const matchesPreview =
+    dayMatches
+        .slice(0, MAX_PREVIEW)
+        .map(match => {
+
+            const isMain =
+                match.role === "Sędzia główny";
+
+            const roleAbbr =
+                isMain ? "SG" : "AS";
+
+            const roleClass =
+                isMain ? "role-sg" : "role-as";
+
+            return `
+                <div class="calendar-match-line ${roleClass}">
+                    <span class="role-tag">${roleAbbr}:</span>${match.homeTeam} - ${match.awayTeam}
+                </div>
+            `;
+
+        })
+        .join("");
+
+dayElement.innerHTML = `
+
+    <div class="day-number">
+        ${day}
+    </div>
+
+    ${
+        matchesCount > 0
+        ?
+        `
+        <div class="calendar-matches">
+
+            ${matchesPreview}
+
+            ${
+                matchesCount > MAX_PREVIEW
+                ?
+                `<div class="more-matches">
+                    +${matchesCount - MAX_PREVIEW}
+                </div>`
+                :
+                ""
+            }
+
+        </div>
+        `
+        :
+        ""
+    }
+
+`;
+if(matchesCount > 0){
+
+    dayElement.title =
+        dayMatches
+            .map(match =>
+                `${
+                    match.role === "Sędzia główny"
+                        ? "SG"
+                        : "AS"
+                }: ${match.homeTeam} - ${match.awayTeam}`
+            )
+            .join("\n");
+
+}
+
+        dayElement.addEventListener(
+            "click",
+            ()=>openDayModal(fullDate)
+        );
+
+        calendarGrid.appendChild(
+            dayElement
+        );
+    }
+
+}
+
+/* ======================================
+   FORMAT DATY
+====================================== */
+
+function formatDate(
+    year,
+    month,
+    day
+){
+
+    const m =
+        String(month).padStart(2,"0");
+
+    const d =
+        String(day).padStart(2,"0");
+
+    return `${year}-${m}-${d}`;
+}
+/* ======================================
+   MODAL
+====================================== */
+
+function openAddModal(date){
+
+    document.getElementById("modalTitle").textContent =
+        "Dodaj mecz";
+
+    document.getElementById("editId").value = "";
+
+    document.getElementById("matchDate").value =
+        date;
+
+    document.getElementById("homeTeam").value = "";
+
+    document.getElementById("awayTeam").value = "";
+
+    setFormSettled(false);
+
+    leagueSelect.selectedIndex = 0;
+    roleSelect.selectedIndex = 0;
+
+    updateAmountPreview();
+
+    modal.classList.add("active");
+}
+
+function openEditModal(id){
+
+    const match =
+        matches.find(m => m.id === id);
+
+    if(!match) return;
+
+    document.getElementById("modalTitle").textContent =
+        "Edytuj mecz";
+
+    document.getElementById("editId").value =
+        match.id;
+
+    document.getElementById("matchDate").value =
+        match.date;
+
+    document.getElementById("homeTeam").value =
+        match.homeTeam;
+
+    document.getElementById("awayTeam").value =
+        match.awayTeam;
+
+    setFormSettled(match.settled);
+
+    leagueSelect.value =
+        match.league;
+
+    roleSelect.value =
+        match.role;
+
+    updateAmountPreview();
+
+    modal.classList.add("active");
+}
+
+function closeModalWindow(){
+
+    modal.classList.remove("active");
+}
+
+/* ======================================
+   MODAL PODGLĄDU DNIA
+====================================== */
+
+function openDayModal(date){
+
+    selectedDayDate = date;
+
+    document.getElementById("dayModalDate").textContent =
+        formatDisplayDate(date);
+
+    renderDayMatchesList(date);
+
+    dayModal.classList.add("active");
+}
+
+function closeDayModal(){
+
+    dayModal.classList.remove("active");
+}
+
+function renderDayMatchesList(date){
+
+    const list =
+        document.getElementById("dayMatchesList");
+
+    const dayMatches =
+        matches.filter(
+            match => match.date === date
+        );
+
+    if(dayMatches.length === 0){
+
+        list.innerHTML = `
+            <p style="color:var(--muted); text-align:center; padding:20px 0;">
+                Brak meczów w tym dniu
+            </p>
+        `;
+
+        return;
+    }
+
+    list.innerHTML = "";
+
+    dayMatches.forEach(match=>{
+
+        const card =
+            document.createElement("div");
+
+        card.className = "day-match-card";
+
+        card.innerHTML = `
+
+            <div class="day-match-title">
+                ${match.homeTeam} - ${match.awayTeam}
+            </div>
+
+            <div>
+                ${match.league} • ${match.role}
+            </div>
+
+            <div style="margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <strong>${match.amount} zł</strong>
+
+                <span style="color:var(--muted); font-size:.8rem;">
+                    Rozliczone:
+                </span>
+
+                <div class="settled-toggle-table">
+
+                    <button
+                        type="button"
+                        class="toggle-btn-sm toggle-yes ${
+                            match.settled ? 'active' : ''
+                        }"
+                        onclick="setMatchSettled(${match.id}, true)"
+                    >
+                        TAK
+                    </button>
+
+                    <button
+                        type="button"
+                        class="toggle-btn-sm toggle-no ${
+                            !match.settled ? 'active' : ''
+                        }"
+                        onclick="setMatchSettled(${match.id}, false)"
+                    >
+                        NIE
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="day-match-actions">
+
+                <button
+                    class="action-btn edit-btn"
+                    onclick="editMatchFromDay(${match.id})"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                    Edytuj
+                </button>
+
+                <button
+                    class="action-btn delete-btn"
+                    onclick="deleteMatchFromDay(${match.id})"
+                >
+                    <i class="fa-solid fa-trash"></i>
+                    Usuń
+                </button>
+
+            </div>
+
+        `;
+
+        list.appendChild(card);
+
+    });
+
+}
+
+function addMatchFromDay(){
+
+    const date = selectedDayDate;
+
+    closeDayModal();
+
+    openAddModal(date);
+}
+
+function editMatchFromDay(id){
+
+    closeDayModal();
+
+    openEditModal(id);
+}
+
+function deleteMatchFromDay(id){
+
+    deleteMatch(id);
+
+    if(selectedDayDate){
+
+        renderDayMatchesList(selectedDayDate);
+    }
+}
+
+/* ======================================
+   EKWIWALENT
+====================================== */
+
+function calculateAmount(){
+
+    const league =
+        leagueSelect.value;
+
+    const role =
+        roleSelect.value;
+
+    if(
+        !league ||
+        !role ||
+        !RATES[league]
+    ){
+        return 0;
+    }
+
+    return RATES[league][role] || 0;
+}
+
+function updateAmountPreview(){
+
+    const amount =
+        calculateAmount();
+
+    calculatedAmount.textContent =
+        `${amount} zł`;
+}
+
+/* ======================================
+   PRZYCISKI ROZLICZONE (FORMULARZ)
+====================================== */
+
+function setFormSettled(value){
+
+    document.getElementById("settled").value =
+        value ? "true" : "false";
+
+    document.getElementById("settledYesBtn")
+        .classList.toggle("active", value);
+
+    document.getElementById("settledNoBtn")
+        .classList.toggle("active", !value);
+}
+
+/* ======================================
+   DODAWANIE / EDYCJA
+====================================== */
+
+function saveMatch(event){
+
+    event.preventDefault();
+
+    const editId =
+        document.getElementById("editId").value;
+
+    const matchData = {
+
+        id:
+            editId
+            ? Number(editId)
+            : Date.now(),
+
+        date:
+            document.getElementById(
+                "matchDate"
+            ).value,
+
+        league:
+            leagueSelect.value,
+
+        role:
+            roleSelect.value,
+
+        homeTeam:
+            document.getElementById(
+                "homeTeam"
+            ).value.trim(),
+
+        awayTeam:
+            document.getElementById(
+                "awayTeam"
+            ).value.trim(),
+
+        amount:
+            calculateAmount(),
+
+        settled:
+            document.getElementById(
+                "settled"
+            ).value === "true"
+
+    };
+
+    if(editId){
+
+        const index =
+            matches.findIndex(
+                m => m.id === Number(editId)
+            );
+
+        if(index !== -1){
+
+            matches[index] = matchData;
+        }
+
+    }else{
+
+        matches.push(matchData);
+    }
+
+    saveData();
+
+    renderCalendar();
+    renderMatchesTable();
+    updateStatistics();
+
+    closeModalWindow();
+
+    showToast(
+        editId
+            ? "Mecz zaktualizowany"
+            : "Mecz dodany"
+    );
+}
+
+/* ======================================
+   USUWANIE
+====================================== */
+
+function deleteMatch(id){
+
+    const confirmDelete =
+        confirm(
+            "Czy na pewno usunąć mecz?"
+        );
+
+    if(!confirmDelete){
+        return;
+    }
+
+    matches =
+        matches.filter(
+            match => match.id !== id
+        );
+
+    saveData();
+
+    renderCalendar();
+    renderMatchesTable();
+    updateStatistics();
+
+    showToast("Mecz usunięty");
+}
+
+/* ======================================
+   STATUS ROZLICZENIA
+====================================== */
+
+function toggleSettled(id){
+
+    const match =
+        matches.find(
+            m => m.id === id
+        );
+
+    if(!match) return;
+
+    setMatchSettled(id, !match.settled);
+}
+
+function setMatchSettled(id, value){
+
+    const match =
+        matches.find(
+            m => m.id === id
+        );
+
+    if(!match) return;
+
+    if(match.settled === value){
+        return;
+    }
+
+    match.settled = value;
+
+    saveData();
+
+    renderMatchesTable();
+    updateStatistics();
+
+    if(selectedDayDate){
+
+        renderDayMatchesList(selectedDayDate);
+    }
+
+    showToast(
+        value
+            ? "Mecz rozliczony"
+            : "Rozliczenie cofnięte"
+    );
+}
+
+/* ======================================
+   MECZE AKTUALNEGO MIESIĄCA
+====================================== */
+
+function getCurrentMonthMatches(){
+
+    return matches.filter(match=>{
+
+        const date =
+            new Date(match.date);
+
+        return (
+            date.getMonth() === currentMonth &&
+            date.getFullYear() === currentYear
+        );
+
+    });
+
+}
+
+/* ======================================
+   TABELA
+====================================== */
+
+function renderMatchesTable(){
+
+    const monthMatches =
+        getCurrentMonthMatches();
+
+    const search =
+        searchInput.value
+            .toLowerCase()
+            .trim();
+
+    const leagueFilter =
+        filterLeague.value;
+
+    const roleFilter =
+        filterRole.value;
+
+    let filtered =
+        monthMatches.filter(match=>{
+
+            const teamMatch =
+
+                match.homeTeam
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                match.awayTeam
+                    .toLowerCase()
+                    .includes(search);
+
+            const leagueMatch =
+                !leagueFilter ||
+                match.league === leagueFilter;
+
+            const roleMatch =
+                !roleFilter ||
+                match.role === roleFilter;
+
+            return (
+                teamMatch &&
+                leagueMatch &&
+                roleMatch
+            );
+
+        });
+
+    filtered.sort((a,b)=>{
+
+        return new Date(a.date) -
+               new Date(b.date);
+
+    });
+
+    if(filtered.length === 0){
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="9"
+                    class="empty-row">
+                    Brak meczów
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    tableBody.innerHTML = "";
+
+    filtered.forEach(match=>{
+
+        const row =
+            document.createElement("tr");
+
+        row.innerHTML = `
+
+            <td>${formatDisplayDate(match.date)}</td>
+
+            <td>${match.league}</td>
+
+            <td>${match.role}</td>
+
+            <td>${match.homeTeam}</td>
+
+            <td>${match.awayTeam}</td>
+
+            <td>${match.amount} zł</td>
+
+            <td>
+
+                <div class="settled-toggle-table">
+
+                    <button
+                        type="button"
+                        class="toggle-btn-sm toggle-yes ${
+                            match.settled ? 'active' : ''
+                        }"
+                        onclick="setMatchSettled(${match.id}, true)"
+                    >
+                        TAK
+                    </button>
+
+                    <button
+                        type="button"
+                        class="toggle-btn-sm toggle-no ${
+                            !match.settled ? 'active' : ''
+                        }"
+                        onclick="setMatchSettled(${match.id}, false)"
+                    >
+                        NIE
+                    </button>
+
+                </div>
+
+            </td>
+
+            <td>
+
+                <button
+                    class="action-btn edit-btn"
+                    onclick="openEditModal(${match.id})"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
+            </td>
+
+            <td>
+
+                <button
+                    class="action-btn delete-btn"
+                    onclick="deleteMatch(${match.id})"
+                >
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+
+            </td>
+
+        `;
+
+        row.addEventListener("dblclick",()=>{
+
+            toggleSettled(match.id);
+
+        });
+
+        tableBody.appendChild(row);
+
+    });
+
+}
+
+/* ======================================
+   FORMAT DATY TABELI
+====================================== */
+
+function formatDisplayDate(date){
+
+    const d = new Date(date);
+
+    return d.toLocaleDateString(
+        "pl-PL"
+    );
+}
+
+/* ======================================
+   STATYSTYKI
+====================================== */
+
+function updateStatistics(){
+
+    const monthMatches =
+        getCurrentMonthMatches();
+
+    const total =
+        monthMatches.reduce(
+            (sum,m)=>sum + m.amount,
+            0
+        );
+
+    const settled =
+        monthMatches
+            .filter(m=>m.settled)
+            .reduce(
+                (sum,m)=>sum + m.amount,
+                0
+            );
+
+    const unpaid =
+        total - settled;
+
+    const unsettledCount =
+        monthMatches.filter(
+            m => !m.settled
+        ).length;
+
+    document.getElementById(
+        "totalAmount"
+    ).textContent =
+        `${total} zł`;
+
+    document.getElementById(
+        "settledAmount"
+    ).textContent =
+        `${settled} zł`;
+
+    document.getElementById(
+        "toPayAmount"
+    ).textContent =
+        `${unpaid} zł`;
+
+    document.getElementById(
+        "matchCount"
+    ).textContent =
+        monthMatches.length;
+
+    document.getElementById(
+        "unsettledCount"
+    ).textContent =
+        unsettledCount;
+}
+
+/* ======================================
+   TOAST
+====================================== */
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent =
+        message;
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+
+        toast.classList.remove(
+            "show"
+        );
+
+    },2500);
+}
+
+/* ======================================
+   PDF
+====================================== */
+
+function loadLogoAsBase64(){
+
+    return fetch("logo.png")
+        .then(res => res.blob())
+        .then(blob => new Promise((resolve)=>{
+
+            const reader = new FileReader();
+
+            reader.onloadend = ()=>
+                resolve(reader.result);
+
+            reader.onerror = ()=>
+                resolve(null);
+
+            reader.readAsDataURL(blob);
+
+        }))
+        .catch(()=> null);
+}
+
+async function exportPDF(){
+
+    const logoBase64 =
+        await loadLogoAsBase64();
+
+    const today = new Date();
+
+    const generatedDate =
+        today.toLocaleDateString("pl-PL") +
+        " " +
+        today.toLocaleTimeString("pl-PL");
+
+    const monthMatches =
+        getCurrentMonthMatches();
+
+    const referee =
+        localStorage.getItem(
+            "lzpn_referee_name"
+        ) || "—";
+
+    const total =
+        monthMatches.reduce(
+            (sum,m)=>sum + m.amount,
+            0
+        );
+
+    const settled =
+        monthMatches
+            .filter(m=>m.settled)
+            .reduce(
+                (sum,m)=>sum + m.amount,
+                0
+            );
+
+    const unpaid =
+        total - settled;
+
+    const tableBody = [
+
+        [
+            { text:"Data", style:"tableHeader" },
+            { text:"Rozgrywki", style:"tableHeader" },
+            { text:"Rola", style:"tableHeader" },
+            { text:"Gospodarz", style:"tableHeader" },
+            { text:"Goście", style:"tableHeader" },
+            { text:"Kwota", style:"tableHeader", alignment:"right" },
+            { text:"Rozl.", style:"tableHeader", alignment:"center" }
+        ]
+
+    ];
+
+    monthMatches
+        .slice()
+        .sort((a,b)=> new Date(a.date) - new Date(b.date))
+        .forEach(match=>{
+
+            tableBody.push([
+
+                { text: formatDisplayDate(match.date), fontSize:9 },
+                { text: match.league, fontSize:9 },
+                { text: match.role, fontSize:9 },
+                { text: match.homeTeam, fontSize:9 },
+                { text: match.awayTeam, fontSize:9 },
+                { text: `${match.amount} zł`, fontSize:9, alignment:"right", bold:true },
+                {
+                    text: match.settled ? "TAK" : "NIE",
+                    fontSize:9,
+                    alignment:"center",
+                    bold:true,
+                    color: match.settled ? "#1a8a4a" : "#c23b32"
+                }
+
+            ]);
+
+        });
+
+    function summaryCard(label, value, accentColor){
+
+        return {
+
+            table:{
+
+                widths:["*"],
+
+                body:[
+
+                    [{
+                        stack:[
+
+                            {
+                                canvas:[{
+                                    type:"rect",
+                                    x:0, y:0,
+                                    w:150, h:3,
+                                    color: accentColor
+                                }]
+                            },
+
+                            {
+                                text: label,
+                                fontSize:9,
+                                bold:true,
+                                color:"#666666",
+                                margin:[0,8,0,4]
+                            },
+
+                            {
+                                text: `${value} zł`,
+                                fontSize:17,
+                                bold:true,
+                                color:"#1a1a1a"
+                            }
+
+                        ],
+                        margin:[10,8,10,10]
+                    }]
+
+                ]
+
+            },
+
+            layout:{
+
+                hLineWidth: ()=> 1,
+                vLineWidth: ()=> 1,
+                hLineColor: ()=> "#e2e2e2",
+                vLineColor: ()=> "#e2e2e2"
+
+            }
+
+        };
+
+    }
+
+    const docDefinition = {
+
+        pageSize:"A4",
+
+        pageMargins:[40,110,40,80],
+
+        images: logoBase64
+            ? { clubLogo: logoBase64 }
+            : {},
+
+        header:function(currentPage){
+
+            return {
+
+                margin:[40,28,40,0],
+
+                stack:[
+
+                    {
+                        columns:[
+
+                            logoBase64
+                                ? { image:"clubLogo", width:42, height:42 }
+                                : { text:"", width:42 },
+
+                            {
+                                width:"*",
+                                margin:[12,2,0,0],
+                                stack:[
+                                    {
+                                        text:"LZPN: BIAŁA PODLASKA",
+                                        fontSize:15,
+                                        bold:true,
+                                        color:"#8a6a1a"
+                                    },
+                                    {
+                                        text:"Rozliczenie ekwiwalentów sędziowskich",
+                                        fontSize:9,
+                                        color:"#777777"
+                                    }
+                                ]
+                            },
+
+                            {
+                                width:"auto",
+                                text:`Strona ${currentPage}`,
+                                fontSize:8,
+                                color:"#999999",
+                                alignment:"right",
+                                margin:[0,10,0,0]
+                            }
+
+                        ]
+                    },
+
+                    {
+                        canvas:[{
+                            type:"line",
+                            x1:0, y1:12,
+                            x2:515, y2:12,
+                            lineWidth:1,
+                            lineColor:"#d4af37"
+                        }]
+                    }
+
+                ]
+
+            };
+
+        },
+
+        footer:function(currentPage,pageCount){
+
+            return {
+
+                margin:[40,10,40,0],
+
+                stack:[
+
+                    {
+                        canvas:[{
+                            type:"line",
+                            x1:0, y1:0,
+                            x2:515, y2:0,
+                            lineWidth:0.5,
+                            lineColor:"#dddddd"
+                        }]
+                    },
+
+                    {
+                        columns:[
+
+                            {
+                                text:"LZPN: Biała Podlaska – Ekwiwalenty sędziowskie",
+                                fontSize:8,
+                                color:"#999999"
+                            },
+
+                            {
+                                text:`Strona ${currentPage} z ${pageCount}`,
+                                fontSize:8,
+                                color:"#999999",
+                                alignment:"right"
+                            }
+
+                        ],
+
+                        margin:[0,6,0,0]
+                    }
+
+                ]
+
+            };
+
+        },
+
+        styles:{
+
+            tableHeader:{
+                bold:true,
+                fontSize:9,
+                color:"#ffffff",
+                fillColor:"#1a1a1a"
+            }
+
+        },
+
+        content:[
+
+            {
+                columns:[
+
+                    {
+                        width:"*",
+                        stack:[
+                            { text:"Sędzia", fontSize:8, color:"#999999" },
+                            { text:referee, fontSize:11, bold:true, margin:[0,1,0,8] },
+                            { text:"Okres rozliczeniowy", fontSize:8, color:"#999999" },
+                            { text:`${MONTHS[currentMonth]} ${currentYear}`, fontSize:11, bold:true }
+                        ]
+                    },
+
+                    {
+                        width:"*",
+                        alignment:"right",
+                        stack:[
+                            { text:"Data wygenerowania", fontSize:8, color:"#999999" },
+                            { text:generatedDate, fontSize:11, bold:true, margin:[0,1,0,8] },
+                            { text:"Liczba meczów", fontSize:8, color:"#999999" },
+                            { text:String(monthMatches.length), fontSize:11, bold:true }
+                        ]
+                    }
+
+                ],
+
+                margin:[0,0,0,18]
+            },
+
+            monthMatches.length > 0
+            ?
+            {
+                table:{
+                    headerRows:1,
+                    widths:[55,80,60,"*","*",50,40],
+                    body: tableBody
+                },
+
+                layout:{
+
+                    hLineWidth:(i, node)=>
+                        (i === 0 || i === node.table.body.length) ? 1 : 0.5,
+
+                    vLineWidth: ()=> 0,
+
+                    hLineColor:(i)=>
+                        i === 1 ? "#1a1a1a" : "#e2e2e2",
+
+                    paddingLeft: ()=> 8,
+                    paddingRight: ()=> 8,
+                    paddingTop: ()=> 7,
+                    paddingBottom: ()=> 7,
+
+                    fillColor:(rowIndex)=>
+                        rowIndex > 0 && rowIndex % 2 === 0
+                            ? "#f7f7f7"
+                            : null
+
+                }
+            }
+            :
+            {
+                table:{
+                    widths:["*"],
+                    body:[[
+                        {
+                            text:"Brak meczów w wybranym miesiącu.",
+                            italics:true,
+                            color:"#999999",
+                            alignment:"center",
+                            margin:[0,20,0,20]
+                        }
+                    ]]
+                },
+                layout:{
+                    hLineColor: ()=> "#e2e2e2",
+                    vLineColor: ()=> "#e2e2e2"
+                }
+            },
+
+            {
+                columns:[
+                    summaryCard("ŁĄCZNA WARTOŚĆ", total, "#8a8a8a"),
+                    summaryCard("ROZLICZONE", settled, "#1a8a4a"),
+                    summaryCard("DO WYPŁATY", unpaid, "#d4af37")
+                ],
+
+                columnGap:14,
+
+                margin:[0,20,0,0]
+            }
+
+        ]
+
+    };
+
+    pdfMake
+        .createPdf(docDefinition)
+        .download(
+            `Ekwiwalenty_${currentMonth+1}_${currentYear}.pdf`
+        );
+
+}
+
+/* ======================================
+   EXCEL
+====================================== */
+
+function exportExcel(){
+
+    const monthMatches =
+        getCurrentMonthMatches();
+
+    const data =
+        monthMatches.map(match=>({
+
+            Data:
+                formatDisplayDate(
+                    match.date
+                ),
+
+            Rozgrywki:
+                match.league,
+
+            Rola:
+                match.role,
+
+            Gospodarz:
+                match.homeTeam,
+
+            Goscie:
+                match.awayTeam,
+
+            Kwota:
+                match.amount,
+
+            Rozliczone:
+                match.settled
+                    ? "TAK"
+                    : "NIE"
+
+        }));
+
+    const worksheet =
+        XLSX.utils.json_to_sheet(
+            data
+        );
+
+    const workbook =
+        XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Ekwiwalenty"
+    );
+
+    XLSX.writeFile(
+        workbook,
+        `Ekwiwalenty_${currentMonth+1}_${currentYear}.xlsx`
+    );
+}
+
+/* ======================================
+   ZAPIS MIESIĄCA
+====================================== */
+
+function saveMonthSnapshot(){
+
+    saveData();
+
+    showToast(
+        "Rozliczenie zapisane"
+    );
+}
+
+/* ======================================
+   EVENTY
+====================================== */
+
+monthSelect.addEventListener(
+    "change",
+    ()=>{
+
+        currentMonth =
+            Number(
+                monthSelect.value
+            );
+
+        renderCalendar();
+        renderMatchesTable();
+        updateStatistics();
+    }
+);
+
+yearSelect.addEventListener(
+    "change",
+    ()=>{
+
+        currentYear =
+            Number(
+                yearSelect.value
+            );
+
+        renderCalendar();
+        renderMatchesTable();
+        updateStatistics();
+    }
+);
+
+prevMonth.addEventListener(
+    "click",
+    ()=>{
+
+        currentMonth--;
+
+        if(currentMonth < 0){
+
+            currentMonth = 11;
+            currentYear--;
+        }
+
+        if(currentYear < 2026){
+
+            currentYear = 2026;
+            currentMonth = 0;
+        }
+
+        monthSelect.value =
+            currentMonth;
+
+        yearSelect.value =
+            currentYear;
+
+        renderCalendar();
+        renderMatchesTable();
+        updateStatistics();
+    }
+);
+
+nextMonth.addEventListener(
+    "click",
+    ()=>{
+
+        currentMonth++;
+
+        if(currentMonth > 11){
+
+            currentMonth = 0;
+            currentYear++;
+        }
+
+        monthSelect.value =
+            currentMonth;
+
+        yearSelect.value =
+            currentYear;
+
+        renderCalendar();
+        renderMatchesTable();
+        updateStatistics();
+    }
+);
+
+closeModal.addEventListener(
+    "click",
+    closeModalWindow
+);
+
+window.addEventListener(
+    "click",
+    (e)=>{
+
+        if(e.target === modal){
+
+            closeModalWindow();
+        }
+
+        if(e.target === dayModal){
+
+            closeDayModal();
+        }
+
+    }
+);
+
+leagueSelect.addEventListener(
+    "change",
+    updateAmountPreview
+);
+
+roleSelect.addEventListener(
+    "change",
+    updateAmountPreview
+);
+
+matchForm.addEventListener(
+    "submit",
+    saveMatch
+);
+
+searchInput.addEventListener(
+    "input",
+    renderMatchesTable
+);
+
+filterLeague.addEventListener(
+    "change",
+    renderMatchesTable
+);
+
+filterRole.addEventListener(
+    "change",
+    renderMatchesTable
+);
+
+document
+.getElementById("pdfBtn")
+.addEventListener(
+    "click",
+    exportPDF
+);
+
+document
+.getElementById("excelBtn")
+.addEventListener(
+    "click",
+    exportExcel
+);
+
+document
+.getElementById("saveMonthBtn")
+.addEventListener(
+    "click",
+    saveMonthSnapshot
+);
+
+/* ======================================
+   START
+====================================== */
+
+loadData();
+
+initializeSelects();
+
+renderCalendar();
+
+renderMatchesTable();
+
+updateStatistics();
+
+updateAmountPreview();
+
+showToast(
+    "Aplikacja gotowa"
+);
+
+/* ======================================
+   DANE SĘDZIEGO
+====================================== */
+
+const REFEREE_KEY =
+    "lzpn_referee_name";
+
+function loadReferee(){
+
+    const name =
+        localStorage.getItem(
+            REFEREE_KEY
+        );
+
+    if(!name){
+
+        document
+            .getElementById("refereeModal")
+            .classList.add("active");
+
+        return;
+    }
+
+    document
+        .getElementById(
+            "refereeNameDisplay"
+        )
+        .textContent =
+        `Sędzia: ${name}`;
+}
+
+function saveReferee(){
+
+    const name =
+        document
+            .getElementById(
+                "refereeNameInput"
+            )
+            .value
+            .trim();
+
+    if(!name){
+
+        alert(
+            "Podaj imię i nazwisko"
+        );
+
+        return;
+    }
+
+    localStorage.setItem(
+        REFEREE_KEY,
+        name
+    );
+
+    document
+        .getElementById(
+            "refereeNameDisplay"
+        )
+        .textContent =
+        `Sędzia: ${name}`;
+
+    document
+        .getElementById(
+            "refereeModal"
+        )
+        .classList.remove("active");
+
+    showToast(
+        "Dane zapisane"
+    );
+}
+
+document
+.getElementById("saveRefereeBtn")
+.addEventListener(
+    "click",
+    saveReferee
+);
+
+document
+.getElementById("changeRefereeBtn")
+.addEventListener(
+    "click",
+    ()=>{
+
+        document
+            .getElementById(
+                "refereeModal"
+            )
+            .classList.add("active");
+
+    }
+);
+
+loadReferee();
+
+/* ======================================
+   LISTA DRUŻYN
+====================================== */
+
+const teamsList =
+    document.getElementById(
+        "teamsList"
+    );
+
+if(teamsList){
+
+    TEAMS
+        .sort()
+        .forEach(team=>{
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = team;
+
+            teamsList.appendChild(
+                option
+            );
+
+        });
+
+}
+function normalizeText(text){
+
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function setupTeamSearch(inputId, suggestionsId){
+
+    const input =
+        document.getElementById(inputId);
+
+    const suggestions =
+        document.getElementById(suggestionsId);
+
+    input.addEventListener("input", ()=>{
+
+        const value =
+            normalizeText(input.value);
+
+        suggestions.innerHTML = "";
+
+        if(value.length < 2){
+
+            suggestions.style.display = "none";
+            return;
+        }
+
+        const filtered =
+            TEAMS.filter(team=>
+
+                normalizeText(team)
+                .includes(value)
+
+            ).slice(0,10);
+
+        if(filtered.length === 0){
+
+            suggestions.style.display = "none";
+            return;
+        }
+
+        filtered.forEach(team=>{
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "suggestion-item";
+
+            item.textContent =
+                team;
+
+            item.addEventListener("click", ()=>{
+
+                input.value = team;
+
+                suggestions.style.display =
+                    "none";
+            });
+
+            suggestions.appendChild(item);
+
+        });
+
+        suggestions.style.display =
+            "block";
+
+    });
+
+    document.addEventListener("click",(e)=>{
+
+        if(
+            !input.contains(e.target) &&
+            !suggestions.contains(e.target)
+        ){
+
+            suggestions.style.display =
+                "none";
+        }
+
+    });
+
+}
+
+setupTeamSearch(
+    "homeTeam",
+    "homeTeamSuggestions"
+);
+
+setupTeamSearch(
+    "awayTeam",
+    "awayTeamSuggestions"
+);

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="style.css">
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LZPN: Biała Podlaska – Ekwiwalenty</title>
+
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="background-glow"></div>
+
+<header class="topbar">
+
+    
+    <div class="logo-box">
+        <img src="logo.png" alt="Logo KS Biała Podlaska" class="club-logo">
+        <div>
+            <h1>LZPN: Biała Podlaska</h1>
+            <span>Ekwiwalenty sędziowskie</span>
+        </div>
+    </div>
+
+    <div class="topbar-links">
+        <a href="https://ksbialapodlaska.pl" target="_blank">
+            Strona Kolegium
+        </a>
+
+        <a href="https://ksbialapodlaska.pl/obsady" target="_blank">
+            Sprawdź obsadę
+        </a>
+    </div>
+
+    <div class="topbar-actions">
+
+        <button id="saveMonthBtn" class="gold-btn">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Zapisz rozliczenie
+        </button>
+
+        <button id="pdfBtn" class="dark-btn">
+            <i class="fa-solid fa-file-pdf"></i>
+            PDF
+        </button>
+
+        <button id="excelBtn" class="dark-btn">
+            <i class="fa-solid fa-file-excel"></i>
+            Excel
+        </button>
+
+    </div>
+</header>
+
+<div class="referee-info glass">
+    <i class="fa-solid fa-user"></i>
+    <span id="refereeNameDisplay">
+        Sędzia: Nie ustawiono
+    </span>
+
+    <button id="changeRefereeBtn" class="dark-btn">
+        Zmień
+    </button>
+</div>
+
+
+<main class="container">
+
+    <!-- KALENDARZ -->
+
+    <section class="glass calendar-section">
+
+        <div class="calendar-header">
+
+            <button id="prevMonth">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="calendar-title">
+<div class="selector-group">
+
+    <div class="selector-box">
+
+        <label>MIESIĄC</label>
+
+        <select id="monthSelect"></select>
+
+    </div>
+
+    <div class="selector-box">
+
+        <label>ROK</label>
+
+        <select id="yearSelect"></select>
+
+    </div>
+
+</div>
+
+            </div>
+
+            <button id="nextMonth">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+        <div class="weekdays">
+            <div>Pn</div>
+            <div>Wt</div>
+            <div>Śr</div>
+            <div>Czw</div>
+            <div>Pt</div>
+            <div>Sob</div>
+            <div>Nd</div>
+        </div>
+
+        <div id="calendarGrid" class="calendar-grid"></div>
+
+    </section>
+
+    <!-- STATYSTYKI -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <span>Łączna wartość</span>
+                <h2 id="totalAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Rozliczone</span>
+                <h2 id="settledAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+
+            <div>
+                <span>Do wypłaty</span>
+                <h2 id="toPayAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-futbol"></i>
+            </div>
+
+            <div>
+                <span>Liczba meczów</span>
+                <h2 id="matchCount">0</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+
+            <div>
+                <span>Nierozliczone</span>
+                <h2 id="unsettledCount">0</h2>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- FILTRY -->
+
+    <section class="glass filter-section">
+
+        <div class="filter-title">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Wyszukiwanie
+        </div>
+
+        <div class="filter-grid">
+
+            <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Szukaj drużyny..."
+            >
+
+            <select id="filterLeague">
+                <option value="">Wszystkie rozgrywki</option>
+            </select>
+
+            <select id="filterRole">
+                <option value="">Wszystkie role</option>
+                <option>Sędzia główny</option>
+                <option>Asystent</option>
+            </select>
+
+        </div>
+
+    </section>
+
+    <!-- TABELA -->
+
+    <section class="glass table-section">
+
+        <div class="table-header">
+
+            <h2>
+                <i class="fa-solid fa-list"></i>
+                Mecze w miesiącu
+            </h2>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Data</th>
+                    <th>Rozgrywki</th>
+                    <th>Rola</th>
+                    <th>Gospodarz</th>
+                    <th>Goście</th>
+                    <th>Kwota</th>
+                    <th>Rozliczone</th>
+                    <th>Edytuj</th>
+                    <th>Usuń</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="matchesTableBody">
+
+                <tr>
+                    <td colspan="9" class="empty-row">
+                        Brak meczów w tym miesiącu
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- MODAL -->
+
+<div id="matchModal" class="modal">
+
+    <div class="modal-content glass">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Dodaj mecz
+            </h2>
+
+            <button id="closeModal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <form id="matchForm">
+
+            <input type="hidden" id="editId">
+
+            <div class="form-group">
+
+                <label>Data meczu</label>
+
+                <input
+                        type="date"
+                        id="matchDate"
+                        required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Klasa rozgrywek</label>
+
+                <select id="league" required></select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Rola</label>
+
+                <select id="role" required>
+
+                    <option value="Sędzia główny">
+                        Sędzia główny
+                    </option>
+
+                    <option value="Asystent">
+                        Asystent
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Drużyna gospodarzy</label>
+
+                <input
+    type="text"
+    id="homeTeam"
+    class="team-search"
+    autocomplete="off"
+    required
+>
+
+<div id="homeTeamSuggestions" class="suggestions"></div>
+
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Drużyna gości</label>
+
+                <input
+    type="text"
+    id="awayTeam"
+    class="team-search"
+    autocomplete="off"
+    required
+>
+
+<div id="awayTeamSuggestions" class="suggestions"></div>
+
+<datalist id="teamsList"></datalist>
+
+            </div>
+
+            <div class="amount-preview">
+
+                <span>Ekwiwalent:</span>
+
+                <strong id="calculatedAmount">
+                    0 zł
+                </strong>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Rozliczone</label>
+
+                <div class="settled-toggle">
+
+                    <button
+                        type="button"
+                        id="settledYesBtn"
+                        class="toggle-btn toggle-yes"
+                        onclick="setFormSettled(true)"
+                    >
+                        TAK
+                    </button>
+
+                    <button
+                        type="button"
+                        id="settledNoBtn"
+                        class="toggle-btn toggle-no"
+                        onclick="setFormSettled(false)"
+                    >
+                        NIE
+                    </button>
+
+                </div>
+
+                <input type="hidden" id="settled" value="false">
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                        type="submit"
+                        class="gold-btn"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Zapisz mecz
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- TOAST -->
+
+<div id="toast" class="toast">
+    Operacja zakończona sukcesem
+</div>
+<footer class="footer">
+    © 2026 LZPN: Biała Podlaska – Ekwiwalenty<br>
+    Wszelkie prawa zastrzeżone.<br>
+    Projekt i wykonanie: <strong>Bartosz Zabielski</strong>
+</footer>
+
+<div id="refereeModal" class="modal">
+
+    <div class="modal-content glass">
+
+        <h2>Podaj swoje dane</h2>
+
+        <div class="form-group">
+
+            <label>Imię i nazwisko</label>
+
+            <input
+                type="text"
+                id="refereeNameInput"
+                placeholder="np. Bartosz Zabielski"
+            >
+
+        </div>
+
+        <button
+            id="saveRefereeBtn"
+            class="gold-btn"
+        >
+            Zapisz
+        </button>
+
+    </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+
+
+<div id="dayModal" class="day-modal">
+
+    <div class="day-modal-content">
+
+        <button
+            class="close-day-modal"
+            onclick="closeDayModal()"
+        >
+            Wróć
+        </button>
+
+        <h2 id="dayModalDate"></h2>
+
+        <div id="dayMatchesList"></div>
+
+        <button
+            class="add-match-btn"
+            onclick="addMatchFromDay()"
+        >
+            + Dodaj mecz
+        </button>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
