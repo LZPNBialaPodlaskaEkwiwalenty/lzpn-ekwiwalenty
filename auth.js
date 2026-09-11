@@ -641,6 +641,38 @@ if(deleteAccountBtnEl){
 }
 
 /* ======================================
+   BLOKADA SCROLLA TŁA PRZY OTWARTYM MODALU
+   (dotyczy wszystkich okienek: logowania,
+   konta, dodawania meczu, widoku dnia)
+====================================== */
+
+function updateBodyScrollLock(){
+
+    const anyModalActive =
+        document.querySelector(".modal.active, .day-modal.active");
+
+    document.body.classList.toggle(
+        "modal-open",
+        !!anyModalActive
+    );
+}
+
+const modalScrollObserver =
+    new MutationObserver(updateBodyScrollLock);
+
+document
+    .querySelectorAll(".modal, .day-modal")
+    .forEach(el=>{
+
+        modalScrollObserver.observe(el, {
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    });
+
+updateBodyScrollLock();
+
+/* ======================================
    PUBLICZNE API DLA script.js
 ====================================== */
 

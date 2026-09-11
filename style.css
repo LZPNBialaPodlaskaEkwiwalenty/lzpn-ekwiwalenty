@@ -53,6 +53,11 @@ body{
     color:var(--text);
 
     overflow-x:hidden;
+
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);
 }
 
 /* =========================
@@ -605,6 +610,11 @@ tbody tr:hover{
     width:100%;
     max-width:650px;
 
+    max-height:88vh;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+
     padding:25px;
 
     animation:modalShow .25s ease;
@@ -943,6 +953,17 @@ tbody tr:hover{
 
     font-size:.78rem;
     opacity:.6;
+}
+
+/* =========================
+   BLOKADA SCROLLA TŁA
+   PRZY OTWARTYM MODALU
+========================= */
+
+body.modal-open{
+
+    overflow:hidden;
+    height:100dvh;
 }
 
 /* =========================
@@ -1403,6 +1424,8 @@ tbody tr:hover{
     max-width:95%;
     max-height:85vh;
     overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
 
     background:#111;
     border:1px solid #d4af37;
