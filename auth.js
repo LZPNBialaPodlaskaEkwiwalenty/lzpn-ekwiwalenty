@@ -187,6 +187,14 @@ if(logoutBtn){
     });
 }
 
+const closeAccountModalBtn = document.getElementById("closeAccountModal");
+
+if(closeAccountModalBtn){
+    closeAccountModalBtn.addEventListener("click", ()=>{
+        document.getElementById("refereeModal").classList.remove("active");
+    });
+}
+
 /* ======================================
    POŁĄCZENIE Z FIREBASE
    (osobno, żeby jego ewentualna awaria
@@ -453,6 +461,183 @@ async function syncRefereeNameToCloud(name){
 
         console.warn("Nie udało się zsynchronizować imienia sędziego.", err);
     }
+}
+
+/* ======================================
+   ZMIANA PIN / USUNIĘCIE KONTA
+====================================== */
+
+function getAccountDangerEls(){
+
+    return {
+        currentPinInput: document.getElementById("currentPinInput"),
+        newPinInput: document.getElementById("newPinInput"),
+        newPinConfirmInput: document.getElementById("newPinConfirmInput"),
+        pinChangeError: document.getElementById("pinChangeError"),
+        changePinBtn: document.getElementById("changePinBtn"),
+        deleteAccountPinInput: document.getElementById("deleteAccountPinInput"),
+        deleteAccountError: document.getElementById("deleteAccountError"),
+        deleteAccountBtn: document.getElementById("deleteAccountBtn")
+    };
+}
+
+function showFieldError(el, msg){
+    if(el){
+        el.textContent = msg;
+        el.classList.add("active");
+    }
+}
+
+function clearFieldError(el){
+    if(el){
+        el.textContent = "";
+        el.classList.remove("active");
+    }
+}
+
+async function handleChangePin(){
+
+    const {
+        currentPinInput, newPinInput, newPinConfirmInput,
+        pinChangeError, changePinBtn
+    } = getAccountDangerEls();
+
+    clearFieldError(pinChangeError);
+
+    if(!firebaseReady || !currentUsername){
+        showFieldError(pinChangeError, "Brak połączenia z serwerem.");
+        return;
+    }
+
+    const currentPin = currentPinInput.value.trim();
+    const newPin = newPinInput.value.trim();
+    const newPinConfirm = newPinConfirmInput.value.trim();
+
+    if(!/^\d{4,8}$/.test(newPin)){
+        showFieldError(pinChangeError, "Nowy PIN musi mieć 4-8 cyfr.");
+        return;
+    }
+
+    if(newPin !== newPinConfirm){
+        showFieldError(pinChangeError, "Nowe PIN-y nie są takie same.");
+        return;
+    }
+
+    changePinBtn.disabled = true;
+    changePinBtn.textContent = "Zmieniam...";
+
+    try{
+
+        const docRef = db.collection("users").doc(currentUsername);
+        const doc = await docRef.get();
+        const data = doc.data() || {};
+
+        const currentHash = await hashPin(currentPin, currentUsername);
+
+        if(data.pinHash !== currentHash){
+            showFieldError(pinChangeError, "Aktualny PIN jest nieprawidłowy.");
+            changePinBtn.disabled = false;
+            changePinBtn.innerHTML = "<i class=\"fa-solid fa-key\"></i> Zmień PIN";
+            return;
+        }
+
+        const newHash = await hashPin(newPin, currentUsername);
+
+        await docRef.update({ pinHash: newHash });
+
+        currentPinInput.value = "";
+        newPinInput.value = "";
+        newPinConfirmInput.value = "";
+
+        showToastSafe("PIN zmieniony");
+
+    }catch(err){
+
+        console.error(err);
+        showFieldError(pinChangeError, "Błąd połączenia. Spróbuj ponownie.");
+
+    }finally{
+
+        changePinBtn.disabled = false;
+        changePinBtn.innerHTML = "<i class=\"fa-solid fa-key\"></i> Zmień PIN";
+    }
+}
+
+async function handleDeleteAccount(){
+
+    const {
+        deleteAccountPinInput, deleteAccountError, deleteAccountBtn
+    } = getAccountDangerEls();
+
+    clearFieldError(deleteAccountError);
+
+    if(!firebaseReady || !currentUsername){
+        showFieldError(deleteAccountError, "Brak połączenia z serwerem.");
+        return;
+    }
+
+    const pin = deleteAccountPinInput.value.trim();
+
+    if(!/^\d{4,8}$/.test(pin)){
+        showFieldError(deleteAccountError, "Podaj swój PIN (4-8 cyfr), żeby potwierdzić.");
+        return;
+    }
+
+    const sure = confirm(
+        "Czy na pewno chcesz trwale usunąć swoje konto i wszystkie zapisane mecze? Tej operacji nie można cofnąć."
+    );
+
+    if(!sure) return;
+
+    deleteAccountBtn.disabled = true;
+    deleteAccountBtn.textContent = "Usuwam...";
+
+    try{
+
+        const docRef = db.collection("users").doc(currentUsername);
+        const doc = await docRef.get();
+        const data = doc.data() || {};
+
+        const hash = await hashPin(pin, currentUsername);
+
+        if(data.pinHash !== hash){
+            showFieldError(deleteAccountError, "Nieprawidłowy PIN.");
+            deleteAccountBtn.disabled = false;
+            deleteAccountBtn.innerHTML = "<i class=\"fa-solid fa-trash\"></i> Usuń konto na zawsze";
+            return;
+        }
+
+        await docRef.delete();
+
+        localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem(LOCAL_CACHE_PREFIX + currentUsername);
+
+        window.location.reload();
+
+    }catch(err){
+
+        console.error(err);
+        showFieldError(deleteAccountError, "Błąd połączenia. Spróbuj ponownie.");
+        deleteAccountBtn.disabled = false;
+        deleteAccountBtn.innerHTML = "<i class=\"fa-solid fa-trash\"></i> Usuń konto na zawsze";
+    }
+}
+
+function showToastSafe(msg){
+
+    if(typeof showToast === "function"){
+        showToast(msg);
+    }
+}
+
+const changePinBtnEl = document.getElementById("changePinBtn");
+if(changePinBtnEl){
+    changePinBtnEl.addEventListener("click", handleChangePin);
+}
+
+const deleteAccountBtnEl = document.getElementById("deleteAccountBtn");
+if(deleteAccountBtnEl){
+    deleteAccountBtnEl.addEventListener("click", handleDeleteAccount);
 }
 
 /* ======================================

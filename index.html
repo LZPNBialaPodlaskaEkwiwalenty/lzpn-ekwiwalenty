@@ -150,7 +150,8 @@
     <span id="currentUserBadge" class="user-badge"></span>
 
     <button id="changeRefereeBtn" class="dark-btn">
-        Zmień
+        <i class="fa-solid fa-gear"></i>
+        Konto
     </button>
 
     <button id="logoutBtn" class="dark-btn logout-btn">
@@ -526,28 +527,90 @@
 
 <div id="refereeModal" class="modal">
 
-    <div class="modal-content glass">
+    <div class="modal-content glass account-modal">
 
-        <h2>Podaj swoje dane</h2>
+        <div class="modal-header">
+            <h2>Twoje konto</h2>
+            <button id="closeAccountModal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
 
-        <div class="form-group">
+        <div class="account-section">
 
-            <label>Imię i nazwisko</label>
+            <h3>Dane sędziego</h3>
 
-            <input
-                type="text"
-                id="refereeNameInput"
-                placeholder="np. Bartosz Zabielski"
+            <div class="form-group">
+
+                <label>Imię i nazwisko</label>
+
+                <input
+                    type="text"
+                    id="refereeNameInput"
+                    placeholder="np. Bartosz Zabielski"
+                >
+
+            </div>
+
+            <button
+                id="saveRefereeBtn"
+                class="gold-btn"
             >
+                Zapisz
+            </button>
 
         </div>
 
-        <button
-            id="saveRefereeBtn"
-            class="gold-btn"
-        >
-            Zapisz
-        </button>
+        <div class="account-section">
+
+            <h3>Zmiana PIN-u</h3>
+
+            <div class="form-group">
+                <label>Aktualny PIN</label>
+                <input type="password" id="currentPinInput" inputmode="numeric" maxlength="8" placeholder="••••">
+            </div>
+
+            <div class="form-group">
+                <label>Nowy PIN (4-8 cyfr)</label>
+                <input type="password" id="newPinInput" inputmode="numeric" maxlength="8" placeholder="np. 1357">
+            </div>
+
+            <div class="form-group">
+                <label>Powtórz nowy PIN</label>
+                <input type="password" id="newPinConfirmInput" inputmode="numeric" maxlength="8" placeholder="np. 1357">
+            </div>
+
+            <div id="pinChangeError" class="login-error"></div>
+
+            <button id="changePinBtn" class="dark-btn">
+                <i class="fa-solid fa-key"></i>
+                Zmień PIN
+            </button>
+
+        </div>
+
+        <div class="account-section danger-zone">
+
+            <h3>Usuń konto</h3>
+
+            <p class="danger-text">
+                Usunie login, PIN oraz wszystkie zapisane mecze z chmury.
+                Tej operacji nie można cofnąć.
+            </p>
+
+            <div class="form-group">
+                <label>Potwierdź PIN-em</label>
+                <input type="password" id="deleteAccountPinInput" inputmode="numeric" maxlength="8" placeholder="••••">
+            </div>
+
+            <div id="deleteAccountError" class="login-error"></div>
+
+            <button id="deleteAccountBtn" class="danger-btn">
+                <i class="fa-solid fa-trash"></i>
+                Usuń konto na zawsze
+            </button>
+
+        </div>
 
     </div>
 
