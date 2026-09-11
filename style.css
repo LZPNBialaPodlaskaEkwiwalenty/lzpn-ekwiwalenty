@@ -37,6 +37,8 @@
 
 html{
     scroll-behavior:smooth;
+    overflow-x:hidden;
+    width:100%;
 }
 
 body{
@@ -918,6 +920,35 @@ tbody tr:hover{
 
         flex:1;
     }
+
+    .referee-info{
+
+        justify-content:center;
+        text-align:center;
+    }
+
+    .referee-info i{
+
+        display:none;
+    }
+
+    #refereeNameDisplay{
+
+        flex-basis:100%;
+        text-align:center;
+    }
+
+    .user-badge{
+
+        flex-basis:100%;
+        text-align:center;
+    }
+
+    .referee-info button{
+
+        flex:1;
+        justify-content:center;
+    }
 }
 
 /* =========================
@@ -978,22 +1009,24 @@ body.modal-open{
     padding:15px 20px;
 
     display:flex;
+    flex-wrap:wrap;
     justify-content:space-between;
     align-items:center;
 
-    gap:15px;
+    gap:12px;
+}
+
+#refereeNameDisplay{
+
+    flex:1 1 160px;
+    min-width:0;
+    font-weight:600;
 }
 
 .referee-info i{
 
     color:var(--gold);
     margin-right:8px;
-}
-
-#refereeNameDisplay{
-
-    flex:1;
-    font-weight:600;
 }
 
 .user-badge{
