@@ -855,6 +855,43 @@ function normalizeObsadyLeague(raw){
         if(rule.test.test(raw)) return rule.value;
     }
 
+    const hasBialaPodlaska = /bia[łl]a\s*podlaska/i.test(raw);
+    const hasWojewodzka = /wojew[oó]dzk/i.test(raw);
+
+    const hasJuniorStarszy =
+        /junior[óoa-ząćęłńśźż]*\s*starsz/i.test(raw) ||
+        /juniorów\s*starszych/i.test(raw) ||
+        /\bA1\b/.test(raw);
+
+    const hasJuniorMlodszy =
+        /junior[óoa-ząćęłńśźż]*\s*m[lł]odsz/i.test(raw) ||
+        /junior[óo]w\s*m[lł]odszych/i.test(raw) ||
+        /\bB2\b/.test(raw);
+
+    const hasTrampkarz =
+        /trampkarz/i.test(raw) ||
+        /\bC[12]\b/.test(raw);
+
+    const hasMlodzik =
+        /m[lł]odzi(cy|k)/i.test(raw) ||
+        /\bD[12]\b/.test(raw);
+
+    if(hasBialaPodlaska){
+
+        if(hasJuniorStarszy) return "Okręgowa: Junior starszy";
+        if(hasJuniorMlodszy) return "Okręgowa: Junior młodszy";
+        if(hasTrampkarz) return "Okręgowa: Trampkarz";
+        if(hasMlodzik) return "Okręgowa: Młodzik";
+    }
+
+    if(hasWojewodzka){
+
+        if(hasJuniorStarszy) return "Wojewódzka: Junior starszy";
+        if(hasJuniorMlodszy) return "Wojewódzka: Junior młodszy";
+        if(hasTrampkarz) return "Wojewódzka: Trampkarz";
+        if(hasMlodzik) return "Wojewódzka: Młodzik";
+    }
+
     return "";
 }
 
