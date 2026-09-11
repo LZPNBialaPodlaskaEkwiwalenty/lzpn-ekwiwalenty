@@ -1088,6 +1088,45 @@ tbody tr:hover{
         flex:1;
     }
 
+    .topbar-links{
+
+        flex-wrap:nowrap;
+        gap:6px;
+        margin:0;
+        width:100%;
+    }
+
+    .topbar-links a{
+
+        flex:1;
+        text-align:center;
+        padding:9px 6px;
+        font-size:.75rem;
+        white-space:nowrap;
+    }
+
+    .selector-group{
+
+        flex-wrap:nowrap;
+        gap:10px;
+    }
+
+    .selector-box{
+
+        flex:1;
+        min-width:0;
+    }
+
+    #monthSelect,
+    #yearSelect{
+
+        min-width:0;
+        width:100%;
+        height:52px;
+        padding:0 10px;
+        font-size:.95rem;
+    }
+
     .referee-info{
 
         justify-content:center;
