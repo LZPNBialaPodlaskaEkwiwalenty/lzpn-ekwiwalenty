@@ -244,12 +244,12 @@ if(closeAccountModalBtn){
 ====================================== */
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD-dvhk6UvwZ97uMdPPshLz0RO9Z7jGGPU",
-    authDomain: "lzpn-ekwiwalenty.firebaseapp.com",
-    projectId: "lzpn-ekwiwalenty",
-    storageBucket: "lzpn-ekwiwalenty.firebasestorage.app",
-    messagingSenderId: "567125368512",
-    appId: "1:567125368512:web:d94276b2e81c5c1fb69725"
+    apiKey: "AIzaSyAUmoa2XgFKqIp9k72rrbryelyqohRtJqw",
+    authDomain: "lzpn-ekwiwalenty-2.firebaseapp.com",
+    projectId: "lzpn-ekwiwalenty-2",
+    storageBucket: "lzpn-ekwiwalenty-2.firebasestorage.app",
+    messagingSenderId: "987798846510",
+    appId: "1:987798846510:web:c36125fc994e4f7935b3bf"
 };
 
 let db = null;
