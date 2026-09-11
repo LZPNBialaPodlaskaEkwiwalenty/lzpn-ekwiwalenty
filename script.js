@@ -808,6 +808,35 @@ function addMatchFromDay(){
     openAddModal(date);
 }
 
+function addMatchFromTable(){
+
+    const today = new Date();
+
+    let defaultDate;
+
+    if(
+        today.getFullYear() === currentYear &&
+        today.getMonth() === currentMonth
+    ){
+
+        defaultDate = formatDate(
+            currentYear,
+            currentMonth + 1,
+            today.getDate()
+        );
+
+    }else{
+
+        defaultDate = formatDate(
+            currentYear,
+            currentMonth + 1,
+            1
+        );
+    }
+
+    openAddModal(defaultDate);
+}
+
 function editMatchFromDay(id){
 
     closeDayModal();
@@ -1907,6 +1936,13 @@ document
 .addEventListener(
     "click",
     exportExcel
+);
+
+document
+.getElementById("addMatchFromTableBtn")
+.addEventListener(
+    "click",
+    addMatchFromTable
 );
 
 /* ======================================
