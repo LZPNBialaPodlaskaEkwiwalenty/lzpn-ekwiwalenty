@@ -253,6 +253,8 @@ button{
     align-items:center;
     justify-content:space-between;
 
+    gap:10px;
+
     margin-bottom:20px;
 }
 
@@ -260,6 +262,8 @@ button{
 
     width:50px;
     height:50px;
+
+    flex-shrink:0;
 
     border-radius:50%;
 
@@ -278,6 +282,9 @@ button{
 
     display:flex;
     gap:12px;
+
+    flex:1;
+    min-width:0;
 }
 
 .calendar-title select{
@@ -1005,7 +1012,7 @@ tbody tr:hover{
 
     .calendar-title{
 
-        flex-direction:column;
+        min-width:0;
     }
 
     .weekdays{
@@ -1105,10 +1112,23 @@ tbody tr:hover{
         white-space:nowrap;
     }
 
+    .calendar-header{
+
+        gap:6px;
+    }
+
+    .calendar-header button{
+
+        width:38px;
+        height:38px;
+        font-size:.85rem;
+    }
+
     .selector-group{
 
         flex-wrap:nowrap;
-        gap:10px;
+        gap:8px;
+        margin-bottom:0;
     }
 
     .selector-box{
@@ -1117,14 +1137,23 @@ tbody tr:hover{
         min-width:0;
     }
 
+    .selector-box label{
+
+        font-size:.65rem;
+        padding-left:2px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+
     #monthSelect,
     #yearSelect{
 
         min-width:0;
         width:100%;
-        height:52px;
-        padding:0 10px;
-        font-size:.95rem;
+        height:44px;
+        padding:0 6px;
+        font-size:.8rem;
     }
 
     .referee-info{
@@ -1850,6 +1879,9 @@ body.modal-open{
     margin-bottom:25px;
 
     flex-wrap:wrap;
+
+    width:100%;
+    min-width:0;
 }
 
 .selector-box{
@@ -1859,6 +1891,8 @@ body.modal-open{
     flex-direction:column;
 
     gap:8px;
+
+    min-width:0;
 }
 
 .selector-box label{
