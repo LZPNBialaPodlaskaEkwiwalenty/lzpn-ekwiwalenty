@@ -182,6 +182,42 @@ if(submitBtn){
 
 setMode("login");
 
+/* ======================================
+   LOSOWE PRZYKŁADOWE DANE W PLACEHOLDERACH
+====================================== */
+
+const SAMPLE_FIRST_NAMES = [
+    "Michał", "Paweł", "Tomasz", "Krzysztof", "Adam",
+    "Piotr", "Marcin", "Jakub", "Łukasz", "Wojciech"
+];
+
+const SAMPLE_LAST_NAMES = [
+    "Kowalski", "Nowak", "Wiśniewski", "Wójcik", "Kamiński",
+    "Lewandowski", "Zieliński", "Dąbrowski", "Kozłowski", "Jankowski"
+];
+
+function setRandomLoginPlaceholders(){
+
+    const firstName = SAMPLE_FIRST_NAMES[
+        Math.floor(Math.random() * SAMPLE_FIRST_NAMES.length)
+    ];
+
+    const lastName = SAMPLE_LAST_NAMES[
+        Math.floor(Math.random() * SAMPLE_LAST_NAMES.length)
+    ];
+
+    const sampleUsername = sanitizeUsername(
+        firstName.charAt(0) + lastName
+    );
+
+    const { fullNameInput: fnInput, usernameInput: unInput } = getLoginEls();
+
+    if(fnInput) fnInput.placeholder = `np. ${firstName} ${lastName}`;
+    if(unInput) unInput.placeholder = `np. ${sampleUsername}`;
+}
+
+setRandomLoginPlaceholders();
+
 const logoutBtn = document.getElementById("logoutBtn");
 
 if(logoutBtn){

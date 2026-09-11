@@ -737,6 +737,8 @@ tbody tr:hover{
     inset:0;
 
     background:rgba(0,0,0,.65);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
 
     display:none;
 
