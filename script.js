@@ -837,6 +837,230 @@ function addMatchFromTable(){
     openAddModal(defaultDate);
 }
 
+/* ======================================
+   IMPORT Z OBSAD PZPN
+====================================== */
+
+const LEAGUE_MAP = [
+    { test: /iv\s*liga/i, value: "4 Liga" },
+    { test: /iii\s*liga/i, value: "3 Liga" },
+    { test: /klasa\s*okr[eę]g/i, value: "Klasa okręgowa" },
+    { test: /klasa\s*["'„”]?a["'„”]?\b/i, value: "Klasa A" },
+    { test: /klasa\s*["'„”]?b["'„”]?\b/i, value: "Klasa B" }
+];
+
+function normalizeObsadyLeague(raw){
+
+    for(const rule of LEAGUE_MAP){
+        if(rule.test.test(raw)) return rule.value;
+    }
+
+    return "";
+}
+
+function parseObsadyLine(line){
+
+    const dateMatch =
+        line.match(/(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
+
+    if(!dateMatch) return null;
+
+    const date = dateMatch[1];
+    const dateIndex = line.indexOf(dateMatch[0]);
+
+    const beforeDate = line.slice(0, dateIndex);
+    const afterDate = line.slice(dateIndex + dateMatch[0].length);
+
+    const leagueRaw =
+        beforeDate.split("\t")[0].trim();
+
+    const afterParts =
+        afterDate
+            .split("\t")
+            .map(p => p.trim())
+            .filter(p => p.length > 0);
+
+    const homeTeam = afterParts[0] || "";
+    const awayTeam = afterParts[1] || "";
+
+    if(!homeTeam || !awayTeam) return null;
+
+    return {
+        date: date,
+        leagueRaw: leagueRaw,
+        league: normalizeObsadyLeague(leagueRaw),
+        homeTeam: homeTeam,
+        awayTeam: awayTeam,
+        role: "Sędzia główny"
+    };
+}
+
+function parseObsadyText(text){
+
+    return text
+        .split("\n")
+        .map(line => parseObsadyLine(line))
+        .filter(row => row !== null);
+}
+
+let parsedObsadyRows = [];
+
+function renderImportPreview(){
+
+    const container =
+        document.getElementById("importObsadyPreview");
+
+    const confirmBtn =
+        document.getElementById("confirmImportObsadyBtn");
+
+    if(parsedObsadyRows.length === 0){
+
+        container.innerHTML =
+            "<p class=\"pending-teams-empty\">Nie rozpoznano żadnych meczów. Sprawdź, czy wklejony fragment zawiera daty w formacie RRRR-MM-DD.</p>";
+
+        confirmBtn.style.display = "none";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const leagueOptions =
+        Object.keys(RATES);
+
+    parsedObsadyRows.forEach((row, index)=>{
+
+        const rowEl =
+            document.createElement("div");
+
+        rowEl.className =
+            "import-row" + (row.league ? "" : " unmapped");
+
+        const dateDisplay =
+            formatDisplayDate(row.date);
+
+        rowEl.innerHTML = `
+            <input type="checkbox" class="import-row-check" data-index="${index}" checked>
+            <span class="import-row-date">${dateDisplay}</span>
+            <span class="import-row-teams">${row.homeTeam} - ${row.awayTeam}</span>
+            <select class="import-row-league" data-index="${index}">
+                <option value="">- wybierz ligę -</option>
+                ${leagueOptions.map(l =>
+                    `<option value="${l}" ${l === row.league ? "selected" : ""}>${l}</option>`
+                ).join("")}
+            </select>
+            <span class="import-row-role">
+                <button type="button" class="role-main-btn active" data-index="${index}">Główny</button>
+                <button type="button" class="role-assist-btn" data-index="${index}">Asystent</button>
+            </span>
+            ${!row.league ? `<span class="import-row-warning">Nie rozpoznano ligi "${row.leagueRaw}" - wybierz ręcznie</span>` : ""}
+        `;
+
+        container.appendChild(rowEl);
+    });
+
+    container.querySelectorAll(".import-row-league").forEach(sel=>{
+        sel.addEventListener("change", (e)=>{
+            const i = Number(e.target.dataset.index);
+            parsedObsadyRows[i].league = e.target.value;
+        });
+    });
+
+    container.querySelectorAll(".role-main-btn").forEach(btn=>{
+        btn.addEventListener("click", (e)=>{
+            const i = Number(e.target.dataset.index);
+            parsedObsadyRows[i].role = "Sędzia główny";
+
+            const rowEl = e.target.closest(".import-row");
+            rowEl.querySelector(".role-main-btn").classList.add("active");
+            rowEl.querySelector(".role-assist-btn").classList.remove("active");
+        });
+    });
+
+    container.querySelectorAll(".role-assist-btn").forEach(btn=>{
+        btn.addEventListener("click", (e)=>{
+            const i = Number(e.target.dataset.index);
+            parsedObsadyRows[i].role = "Asystent";
+
+            const rowEl = e.target.closest(".import-row");
+            rowEl.querySelector(".role-assist-btn").classList.add("active");
+            rowEl.querySelector(".role-main-btn").classList.remove("active");
+        });
+    });
+
+    confirmBtn.style.display = "flex";
+}
+
+function handleParseObsady(){
+
+    const text =
+        document.getElementById("importObsadyTextarea").value;
+
+    parsedObsadyRows = parseObsadyText(text);
+
+    renderImportPreview();
+}
+
+function confirmImportObsady(){
+
+    const container =
+        document.getElementById("importObsadyPreview");
+
+    const checked =
+        Array.from(
+            container.querySelectorAll(".import-row-check:checked")
+        ).map(cb => Number(cb.dataset.index));
+
+    if(checked.length === 0){
+        alert("Zaznacz przynajmniej jeden mecz do zaimportowania.");
+        return;
+    }
+
+    const missingLeague =
+        checked.some(i => !parsedObsadyRows[i].league);
+
+    if(missingLeague){
+        alert("Dla niektórych zaznaczonych meczów nie wybrano ligi - uzupełnij przed importem.");
+        return;
+    }
+
+    let imported = 0;
+
+    checked.forEach(i=>{
+
+        const row = parsedObsadyRows[i];
+
+        const amount =
+            (RATES[row.league] && RATES[row.league][row.role]) || 0;
+
+        matches.push({
+            id: Date.now() + i,
+            date: row.date,
+            league: row.league,
+            role: row.role,
+            homeTeam: row.homeTeam,
+            awayTeam: row.awayTeam,
+            amount: amount,
+            settled: false
+        });
+
+        imported++;
+    });
+
+    saveData();
+
+    renderCalendar();
+    renderMatchesTable();
+    updateStatistics();
+
+    document.getElementById("importObsadyModal").classList.remove("active");
+    document.getElementById("importObsadyTextarea").value = "";
+    document.getElementById("importObsadyPreview").innerHTML = "";
+    document.getElementById("confirmImportObsadyBtn").style.display = "none";
+    parsedObsadyRows = [];
+
+    showToast(`Zaimportowano ${imported} ${imported === 1 ? "mecz" : "mecze(ów)"}`);
+}
+
 function editMatchFromDay(id){
 
     closeDayModal();
@@ -1943,6 +2167,38 @@ document
 .addEventListener(
     "click",
     addMatchFromTable
+);
+
+document
+.getElementById("openImportObsadyBtn")
+.addEventListener(
+    "click",
+    ()=>{
+        document.getElementById("importObsadyModal").classList.add("active");
+    }
+);
+
+document
+.getElementById("closeImportObsadyModal")
+.addEventListener(
+    "click",
+    ()=>{
+        document.getElementById("importObsadyModal").classList.remove("active");
+    }
+);
+
+document
+.getElementById("parseObsadyBtn")
+.addEventListener(
+    "click",
+    handleParseObsady
+);
+
+document
+.getElementById("confirmImportObsadyBtn")
+.addEventListener(
+    "click",
+    confirmImportObsady
 );
 
 /* ======================================

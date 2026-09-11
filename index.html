@@ -400,10 +400,19 @@
 
         </div>
 
-        <button id="addMatchFromTableBtn" class="add-match-from-table-btn">
-            <i class="fa-solid fa-plus"></i>
-            Dodaj mecz
-        </button>
+        <div class="table-actions-row">
+
+            <button id="addMatchFromTableBtn" class="add-match-from-table-btn">
+                <i class="fa-solid fa-plus"></i>
+                Dodaj mecz
+            </button>
+
+            <button id="openImportObsadyBtn" class="add-match-from-table-btn import-obsady-btn">
+                <i class="fa-solid fa-file-import"></i>
+                Importuj z Obsad
+            </button>
+
+        </div>
 
     </section>
 
@@ -582,6 +591,45 @@
         <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com?subject=Brakuj%C4%85ca%20dru%C5%BCyna%20w%20aplikacji%20Ekwiwalenty">Zgłoś problem</a>
     </span>
 </footer>
+
+<div id="importObsadyModal" class="modal">
+
+    <div class="modal-content glass import-obsady-modal">
+
+        <div class="modal-header">
+            <h2>Importuj z Obsad</h2>
+            <button id="closeImportObsadyModal" aria-label="Zamknij import">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p class="import-obsady-hint">
+            Zaloguj się do Extranetu PZPN w innej karcie, zaznacz i skopiuj
+            (Ctrl+C) swoje przydzielone mecze z tabeli Obsad, a potem wklej
+            tutaj (Ctrl+V).
+        </p>
+
+        <textarea
+            id="importObsadyTextarea"
+            class="import-obsady-textarea"
+            placeholder="Wklej tu skopiowany fragment z Obsad..."
+        ></textarea>
+
+        <button id="parseObsadyBtn" class="gold-btn import-obsady-parse-btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Wczytaj mecze
+        </button>
+
+        <div id="importObsadyPreview" class="import-obsady-preview"></div>
+
+        <button id="confirmImportObsadyBtn" class="gold-btn import-obsady-confirm-btn" style="display:none;">
+            <i class="fa-solid fa-check"></i>
+            Importuj zaznaczone
+        </button>
+
+    </div>
+
+</div>
 
 <div id="teamsAdminModal" class="modal">
 

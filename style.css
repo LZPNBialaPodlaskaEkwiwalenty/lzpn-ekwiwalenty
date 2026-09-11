@@ -2027,6 +2027,184 @@ body.modal-open{
     box-shadow:0 10px 25px rgba(212,175,55,.25);
 }
 
+.table-actions-row{
+
+    display:flex;
+    gap:14px;
+    margin-top:20px;
+}
+
+.table-actions-row .add-match-from-table-btn{
+    margin-top:0;
+}
+
+.import-obsady-btn{
+
+    background:#181818;
+    color:white;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.import-obsady-btn:hover{
+    border-color:var(--gold);
+    color:var(--gold);
+    box-shadow:none;
+    transform:translateY(-2px);
+}
+
+/* =========================
+   IMPORT Z OBSAD
+========================= */
+
+.import-obsady-modal{
+
+    max-width:700px;
+    max-height:85vh;
+    overflow-y:auto;
+}
+
+.import-obsady-hint{
+
+    font-size:.85rem;
+    opacity:.7;
+    line-height:1.5;
+    margin-bottom:14px;
+}
+
+.import-obsady-textarea{
+
+    width:100%;
+    min-height:120px;
+
+    padding:13px 15px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+
+    background:#151515;
+    color:white;
+
+    font-family:inherit;
+    font-size:.85rem;
+
+    resize:vertical;
+
+    margin-bottom:14px;
+}
+
+.import-obsady-textarea:focus{
+    outline:none;
+    border-color:var(--gold);
+}
+
+.import-obsady-parse-btn,
+.import-obsady-confirm-btn{
+
+    width:100%;
+    justify-content:center;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.import-obsady-confirm-btn{
+    margin-top:14px;
+}
+
+.import-obsady-preview{
+
+    margin-top:16px;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.import-row{
+
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+
+    padding:12px 14px;
+
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:12px;
+
+    background:rgba(255,255,255,.03);
+}
+
+.import-row.unmapped{
+
+    border-color:rgba(255,159,10,.4);
+    background:rgba(255,159,10,.06);
+}
+
+.import-row-check{
+
+    flex-shrink:0;
+    width:18px;
+    height:18px;
+    accent-color:var(--gold);
+}
+
+.import-row-date{
+
+    flex-shrink:0;
+    font-size:.8rem;
+    opacity:.75;
+    width:80px;
+}
+
+.import-row-teams{
+
+    flex:1 1 180px;
+    font-size:.85rem;
+    font-weight:600;
+    min-width:150px;
+}
+
+.import-row-league{
+
+    flex:1 1 160px;
+    min-width:140px;
+    padding:8px 10px;
+    font-size:.8rem;
+}
+
+.import-row-role{
+
+    display:flex;
+    gap:4px;
+    flex-shrink:0;
+}
+
+.import-row-role button{
+
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:.72rem;
+    font-weight:700;
+
+    background:rgba(255,255,255,.06);
+    color:var(--muted);
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.import-row-role button.active{
+
+    background:rgba(212,175,55,.18);
+    color:var(--gold-light,#f0cf66);
+    border-color:rgba(212,175,55,.5);
+}
+
+.import-row-warning{
+
+    flex-basis:100%;
+    font-size:.72rem;
+    color:#ffb347;
+}
+
 .topbar{
     display:flex;
     align-items:center;
