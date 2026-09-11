@@ -2095,6 +2095,47 @@ body.modal-open{
     margin-top:0;
 }
 
+.generate-report-btn{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    width:100%;
+    margin-top:14px;
+
+    padding:16px 20px;
+    border-radius:12px;
+    font-size:1.05rem;
+}
+
+.move-btn-group{
+
+    display:flex;
+    gap:6px;
+    justify-content:center;
+}
+
+.move-btn-group .move-btn{
+
+    width:34px;
+    height:34px;
+
+    background:#181818;
+    color:var(--gold-light,#f0cf66);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.move-btn-group .move-btn:hover:not(:disabled){
+    border-color:var(--gold);
+}
+
+.move-btn-group .move-btn:disabled{
+    opacity:.3;
+    cursor:not-allowed;
+}
+
 .import-obsady-btn{
 
     background:#181818;

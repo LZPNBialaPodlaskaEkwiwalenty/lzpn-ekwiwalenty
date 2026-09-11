@@ -775,7 +775,7 @@ function renderDayMatchesList(date){
 
                 <button
                     class="action-btn move-btn"
-                    onclick="moveMatchInDay(${match.id}, -1)"
+                    onclick="moveMatch(${match.id}, -1)"
                     ${index === 0 ? "disabled" : ""}
                     aria-label="Przenieś wyżej"
                 >
@@ -784,7 +784,7 @@ function renderDayMatchesList(date){
 
                 <button
                     class="action-btn move-btn"
-                    onclick="moveMatchInDay(${match.id}, 1)"
+                    onclick="moveMatch(${match.id}, 1)"
                     ${index === dayMatches.length - 1 ? "disabled" : ""}
                     aria-label="Przenieś niżej"
                 >
@@ -817,12 +817,15 @@ function renderDayMatchesList(date){
 
 }
 
-function moveMatchInDay(id, direction){
+function moveMatch(id, direction){
 
-    const date = selectedDayDate;
+    const match =
+        matches.find(m => m.id === id);
+
+    if(!match) return;
 
     const dayMatches =
-        matches.filter(m => m.date === date);
+        matches.filter(m => m.date === match.date);
 
     const posInDay =
         dayMatches.findIndex(m => m.id === id);
@@ -844,8 +847,15 @@ function moveMatchInDay(id, direction){
 
     saveData();
 
-    renderDayMatchesList(date);
     renderCalendar();
+    renderMatchesTable();
+
+    if(
+        dayModal.classList.contains("active") &&
+        selectedDayDate === match.date
+    ){
+        renderDayMatchesList(match.date);
+    }
 }
 
 function addMatchFromDay(){
@@ -1459,7 +1469,7 @@ function renderMatchesTable(){
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="9"
+                <td colspan="10"
                     class="empty-row">
                     Brak meczów
                 </td>
@@ -1472,6 +1482,15 @@ function renderMatchesTable(){
     tableBody.innerHTML = "";
 
     filtered.forEach(match=>{
+
+        const dayMatches =
+            matches.filter(m => m.date === match.date);
+
+        const posInDay =
+            dayMatches.findIndex(m => m.id === match.id);
+
+        const canMoveUp = posInDay > 0;
+        const canMoveDown = posInDay < dayMatches.length - 1;
 
         const row =
             document.createElement("tr");
@@ -1514,6 +1533,32 @@ function renderMatchesTable(){
                         aria-label="Oznacz jako nierozliczone"
                     >
                         NIE
+                    </button>
+
+                </div>
+
+            </td>
+
+            <td data-label="Kolejność">
+
+                <div class="move-btn-group">
+
+                    <button
+                        class="action-btn move-btn"
+                        onclick="moveMatch(${match.id}, -1)"
+                        ${canMoveUp ? "" : "disabled"}
+                        aria-label="Przenieś wyżej"
+                    >
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </button>
+
+                    <button
+                        class="action-btn move-btn"
+                        onclick="moveMatch(${match.id}, 1)"
+                        ${canMoveDown ? "" : "disabled"}
+                        aria-label="Przenieś niżej"
+                    >
+                        <i class="fa-solid fa-arrow-down"></i>
                     </button>
 
                 </div>
@@ -2043,65 +2088,6 @@ async function exportPDF(){
 }
 
 /* ======================================
-   EXCEL
-====================================== */
-
-function exportExcel(){
-
-    const monthMatches =
-        getCurrentMonthMatches();
-
-    const data =
-        monthMatches.map(match=>({
-
-            Data:
-                formatDisplayDate(
-                    match.date
-                ),
-
-            Rozgrywki:
-                match.league,
-
-            Rola:
-                match.role,
-
-            Gospodarz:
-                match.homeTeam,
-
-            Goscie:
-                match.awayTeam,
-
-            Kwota:
-                match.amount,
-
-            Rozliczone:
-                match.settled
-                    ? "TAK"
-                    : "NIE"
-
-        }));
-
-    const worksheet =
-        XLSX.utils.json_to_sheet(
-            data
-        );
-
-    const workbook =
-        XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        "Ekwiwalenty"
-    );
-
-    XLSX.writeFile(
-        workbook,
-        `Ekwiwalenty_${currentMonth+1}_${currentYear}.xlsx`
-    );
-}
-
-/* ======================================
    EVENTY
 ====================================== */
 
@@ -2246,13 +2232,6 @@ document
 .addEventListener(
     "click",
     exportPDF
-);
-
-document
-.getElementById("excelBtn")
-.addEventListener(
-    "click",
-    exportExcel
 );
 
 document

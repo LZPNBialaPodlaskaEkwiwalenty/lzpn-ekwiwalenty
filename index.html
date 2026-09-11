@@ -30,9 +30,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 
-    <!-- XLSX -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
     <!-- FIREBASE (logowanie i synchronizacja w chmurze) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
@@ -144,20 +141,6 @@
         <a href="https://lzpn.pl/2026/08/05/tabela-ekwiwalentow-sedziowskich-ks-lzpn-sezon-2026-2027/" target="_blank">
             Aktualne stawki
         </a>
-    </div>
-
-    <div class="topbar-actions">
-
-        <button id="pdfBtn" class="dark-btn">
-            <i class="fa-solid fa-file-pdf"></i>
-            PDF
-        </button>
-
-        <button id="excelBtn" class="dark-btn">
-            <i class="fa-solid fa-file-excel"></i>
-            Excel
-        </button>
-
     </div>
 </header>
 
@@ -379,6 +362,7 @@
                     <th>Goście</th>
                     <th>Kwota</th>
                     <th>Rozliczone</th>
+                    <th>Kolejność</th>
                     <th>Edytuj</th>
                     <th>Usuń</th>
 
@@ -389,7 +373,7 @@
                 <tbody id="matchesTableBody">
 
                 <tr>
-                    <td colspan="9" class="empty-row">
+                    <td colspan="10" class="empty-row">
                         Brak meczów w tym miesiącu
                     </td>
                 </tr>
@@ -413,6 +397,11 @@
             </button>
 
         </div>
+
+        <button id="pdfBtn" class="gold-btn generate-report-btn">
+            <i class="fa-solid fa-file-pdf"></i>
+            Generuj raport PDF za ten miesiąc
+        </button>
 
     </section>
 
