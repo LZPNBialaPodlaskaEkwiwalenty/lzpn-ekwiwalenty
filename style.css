@@ -1490,6 +1490,34 @@ body.modal-open{
     justify-content:center;
 }
 
+.field-hint{
+
+    margin-top:6px;
+
+    font-size:.72rem;
+    opacity:.6;
+    line-height:1.4;
+}
+
+.forgot-pin-link{
+
+    display:block;
+    width:100%;
+    text-align:center;
+
+    margin-top:12px;
+
+    background:none;
+    color:var(--gold-light,#f0cf66);
+    opacity:.8;
+    font-size:.82rem;
+}
+
+.forgot-pin-link:hover{
+    opacity:1;
+    text-decoration:underline;
+}
+
 .adblock-hint{
 
     margin-top:14px;

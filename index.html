@@ -80,6 +80,21 @@
             >
         </div>
 
+        <div class="form-group" id="emailGroup" style="display:none;">
+            <label>E-mail (opcjonalnie)</label>
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="np. jan.kowalski@gmail.com"
+                autocomplete="email"
+            >
+            <p class="field-hint">
+                Możesz zostawić puste, ale bez e-maila nie da się później
+                zresetować zapomnianego PIN-u/hasła — możesz go dopisać
+                w każdej chwili w sekcji "Konto".
+            </p>
+        </div>
+
         <div class="form-group">
             <label>Login</label>
             <input
@@ -91,14 +106,13 @@
         </div>
 
         <div class="form-group">
-            <label>PIN (6-8 cyfr)</label>
+            <label>PIN / Hasło (min. 6 znaków)</label>
             <input
                 type="password"
                 id="loginPin"
-                placeholder="np. 2468"
-                inputmode="numeric"
+                placeholder="np. Sedzia2026"
                 autocomplete="current-password"
-                maxlength="8"
+                maxlength="24"
             >
         </div>
 
@@ -107,6 +121,10 @@
         <button id="loginSubmitBtn" class="gold-btn login-submit">
             <i class="fa-solid fa-right-to-bracket"></i>
             Zaloguj
+        </button>
+
+        <button type="button" id="forgotPinBtn" class="forgot-pin-link">
+            Zapomniałeś PIN-u/hasła?
         </button>
 
         <p class="adblock-hint">
@@ -732,21 +750,47 @@
 
         <div class="account-section">
 
-            <h3>Zmiana PIN-u</h3>
+            <h3>E-mail (do resetu PIN-u)</h3>
+
+            <p class="danger-text">
+                Jeśli zakładałeś konto zanim dodaliśmy tę opcję, dopisz swój e-mail,
+                żeby móc skorzystać z "Zapomniałeś PIN-u?" na ekranie logowania.
+            </p>
 
             <div class="form-group">
-                <label>Aktualny PIN</label>
-                <input type="password" id="currentPinInput" inputmode="numeric" maxlength="8" placeholder="••••">
+                <label>Twój e-mail</label>
+                <input
+                    type="email"
+                    id="accountEmailInput"
+                    placeholder="np. jan.kowalski@gmail.com"
+                >
+            </div>
+
+            <div id="accountEmailError" class="login-error"></div>
+
+            <button id="saveAccountEmailBtn" class="gold-btn">
+                Zapisz e-mail
+            </button>
+
+        </div>
+
+        <div class="account-section">
+
+            <h3>Zmiana PIN-u / hasła</h3>
+
+            <div class="form-group">
+                <label>Aktualny PIN / hasło</label>
+                <input type="password" id="currentPinInput" maxlength="24" placeholder="••••">
             </div>
 
             <div class="form-group">
-                <label>Nowy PIN (6-8 cyfr)</label>
-                <input type="password" id="newPinInput" inputmode="numeric" maxlength="8" placeholder="np. 1357">
+                <label>Nowy PIN / hasło (min. 6 znaków)</label>
+                <input type="password" id="newPinInput" maxlength="24" placeholder="np. Sedzia2026">
             </div>
 
             <div class="form-group">
-                <label>Powtórz nowy PIN</label>
-                <input type="password" id="newPinConfirmInput" inputmode="numeric" maxlength="8" placeholder="np. 1357">
+                <label>Powtórz nowy PIN / hasło</label>
+                <input type="password" id="newPinConfirmInput" maxlength="24" placeholder="np. Sedzia2026">
             </div>
 
             <div id="pinChangeError" class="login-error"></div>
@@ -784,7 +828,7 @@
 
             <div class="form-group">
                 <label>Potwierdź PIN-em</label>
-                <input type="password" id="deleteAccountPinInput" inputmode="numeric" maxlength="8" placeholder="••••">
+                <input type="password" id="deleteAccountPinInput" maxlength="24" placeholder="••••">
             </div>
 
             <div id="deleteAccountError" class="login-error"></div>

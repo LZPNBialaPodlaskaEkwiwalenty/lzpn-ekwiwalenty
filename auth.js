@@ -19,8 +19,20 @@ let handlingExplicitAuth = false;
    NARZĘDZIA
 ====================================== */
 
-function usernameToEmail(username){
-    return username + "@" + EMAIL_DOMAIN;
+async function lookupEmailForUsername(username){
+
+    try{
+        const doc = await db.collection("usernames").doc(username).get();
+        if(doc.exists && doc.data().email) return doc.data().email;
+    }catch(e){
+        console.warn("Nie udało się znaleźć e-maila dla loginu.", e);
+    }
+
+    return null;
+}
+
+function isSyntheticEmail(email){
+    return typeof email === "string" && email.endsWith("@" + EMAIL_DOMAIN);
 }
 
 function escapeHtml(str){
@@ -62,6 +74,8 @@ function getLoginEls(){
         modal: document.getElementById("loginModal"),
         fullNameGroup: document.getElementById("fullNameGroup"),
         fullNameInput: document.getElementById("loginFullName"),
+        emailGroup: document.getElementById("emailGroup"),
+        emailInput: document.getElementById("loginEmail"),
         usernameInput: document.getElementById("loginUsername"),
         pinInput: document.getElementById("loginPin"),
         submitBtn: document.getElementById("loginSubmitBtn"),
@@ -97,7 +111,7 @@ function setMode(mode){
     currentMode = mode;
 
     const {
-        fullNameGroup, subtitleEl, loginModeBtn,
+        fullNameGroup, emailGroup, subtitleEl, loginModeBtn,
         registerModeBtn, submitBtn
     } = getLoginEls();
 
@@ -106,8 +120,9 @@ function setMode(mode){
     if(mode === "register"){
 
         fullNameGroup.style.display = "block";
+        emailGroup.style.display = "block";
         subtitleEl.textContent =
-            "Podaj imię i nazwisko, login oraz PIN, żeby założyć nowe konto.";
+            "Podaj imię i nazwisko, e-mail, login oraz PIN, żeby założyć nowe konto.";
 
         loginModeBtn.classList.remove("active");
         registerModeBtn.classList.add("active");
@@ -118,6 +133,7 @@ function setMode(mode){
     }else{
 
         fullNameGroup.style.display = "none";
+        emailGroup.style.display = "none";
         subtitleEl.textContent =
             "Podaj swój login i PIN.";
 
@@ -192,6 +208,11 @@ if(registerModeBtn){
 
 if(submitBtn){
     submitBtn.addEventListener("click", handleLoginSubmit);
+}
+
+const forgotPinBtn = document.getElementById("forgotPinBtn");
+if(forgotPinBtn){
+    forgotPinBtn.addEventListener("click", handleForgotPin);
 }
 
 setMode("login");
@@ -342,9 +363,10 @@ async function handleLoginSubmit(){
         return;
     }
 
-    const { fullNameInput, usernameInput, pinInput } = getLoginEls();
+    const { fullNameInput, emailInput, usernameInput, pinInput } = getLoginEls();
 
     const fullName = fullNameInput.value.trim();
+    const rawEmail = emailInput.value.trim();
     const username = sanitizeUsername(usernameInput.value);
     const pin = pinInput.value.trim();
 
@@ -357,8 +379,8 @@ async function handleLoginSubmit(){
 
     if(currentMode === "register"){
 
-        if(!/^\d{4,8}$/.test(pin)){
-            showLoginError("PIN musi się składać z 4 do 8 cyfr.");
+        if(pin.length < 4){
+            showLoginError("PIN/hasło musi mieć min. 4 znaki.");
             return;
         }
 
@@ -367,18 +389,21 @@ async function handleLoginSubmit(){
             return;
         }
 
+        if(rawEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)){
+            showLoginError("Podaj prawidłowy adres e-mail albo zostaw pole puste.");
+            return;
+        }
+
     }else{
 
-        if(!/^\d{6,8}$/.test(pin)){
-            showLoginError("PIN musi się składać z 6 do 8 cyfr.");
+        if(pin.length < 6){
+            showLoginError("PIN/hasło musi mieć min. 6 znaków.");
             return;
         }
     }
 
     setSubmitLoading(true);
     handlingExplicitAuth = true;
-
-    const email = usernameToEmail(username);
 
     try{
 
@@ -420,11 +445,11 @@ async function handleLoginSubmit(){
             if(migratedMatches !== null && finalPin.length < 6){
 
                 const newPin = prompt(
-                    "Twoje dotychczasowe konto zostało znalezione, ale ten PIN jest za krótki dla nowego, bezpieczniejszego logowania (min. 6 cyfr). Podaj nowy PIN (6-8 cyfr), którego chcesz używać od teraz:"
+                    "Twoje dotychczasowe konto zostało znalezione, ale ten PIN jest za krótki dla nowego, bezpieczniejszego logowania (min. 6 znaków). Podaj nowy PIN/hasło, którego chcesz używać od teraz:"
                 );
 
-                if(!newPin || !/^\d{6,8}$/.test(newPin)){
-                    showLoginError("Migracja przerwana - nowy PIN musi mieć 6-8 cyfr.");
+                if(!newPin || newPin.length < 6){
+                    showLoginError("Migracja przerwana - nowy PIN/hasło musi mieć min. 6 znaków.");
                     setSubmitLoading(false);
                     handlingExplicitAuth = false;
                     return;
@@ -434,24 +459,27 @@ async function handleLoginSubmit(){
 
             }else if(migratedMatches === null && finalPin.length < 6){
 
-                showLoginError("PIN musi się składać z 6 do 8 cyfr.");
+                showLoginError("PIN/hasło musi mieć min. 6 znaków.");
                 setSubmitLoading(false);
                 handlingExplicitAuth = false;
                 return;
             }
 
             let cred;
+            const finalEmail = rawEmail || (username + "@" + EMAIL_DOMAIN);
 
             try{
 
-                cred = await auth.createUserWithEmailAndPassword(email, finalPin);
+                cred = await auth.createUserWithEmailAndPassword(finalEmail, finalPin);
 
             }catch(err){
 
                 if(err.code === "auth/email-already-in-use"){
-                    showLoginError("Ten login jest już zajęty. Przełącz się na \"Mam konto\", żeby się zalogować.");
+                    showLoginError("Ten e-mail jest już powiązany z innym kontem.");
                 }else if(err.code === "auth/weak-password"){
-                    showLoginError("PIN jest za krótki (min. 6 cyfr).");
+                    showLoginError("PIN/hasło jest za krótkie (min. 6 znaków).");
+                }else if(err.code === "auth/invalid-email"){
+                    showLoginError("Podaj prawidłowy adres e-mail.");
                 }else{
                     showLoginError("Błąd połączenia z serwerem. Spróbuj ponownie.");
                 }
@@ -461,9 +489,29 @@ async function handleLoginSubmit(){
                 return;
             }
 
+            const usernameDocRef = db.collection("usernames").doc(username);
+            const usernameDoc = await usernameDocRef.get();
+
+            if(usernameDoc.exists){
+
+                showLoginError("Ten login jest już zajęty. Przełącz się na \"Mam konto\", żeby się zalogować.");
+
+                try{ await cred.user.delete(); }catch(e){}
+
+                setSubmitLoading(false);
+                handlingExplicitAuth = false;
+                return;
+            }
+
+            await usernameDocRef.set({
+                email: finalEmail,
+                uid: cred.user.uid
+            });
+
             await db.collection("users").doc(cred.user.uid).set({
                 username: username,
                 refereeName: migratedRefereeName || fullName,
+                email: finalEmail,
                 matches: migratedMatches || [],
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -484,7 +532,25 @@ async function handleLoginSubmit(){
 
             try{
 
-                const cred = await auth.signInWithEmailAndPassword(email, pin);
+                const foundEmail = await lookupEmailForUsername(username);
+
+                if(!foundEmail){
+
+                    const legacyDoc = await db.collection("users").doc(username).get();
+                    const legacyExists = legacyDoc.exists && !!legacyDoc.data().pinHash;
+
+                    if(legacyExists){
+                        showLoginError("To konto działa jeszcze na starym systemie logowania. Przełącz się na \"Zakładam konto\" i zaloguj się tym samym loginem i PIN-em, żeby bezpiecznie przenieść dane.");
+                    }else{
+                        showLoginError("Nie ma takiego konta.");
+                    }
+
+                    setSubmitLoading(false);
+                    handlingExplicitAuth = false;
+                    return;
+                }
+
+                const cred = await auth.signInWithEmailAndPassword(foundEmail, pin);
                 localStorage.setItem(SESSION_STARTED_KEY, Date.now().toString());
                 await completeLogin(cred.user);
 
@@ -495,20 +561,7 @@ async function handleLoginSubmit(){
                     err.code === "auth/wrong-password" ||
                     err.code === "auth/invalid-credential"
                 ){
-
-                    let legacyExists = false;
-
-                    try{
-                        const legacyDoc = await db.collection("users").doc(username).get();
-                        legacyExists = legacyDoc.exists && !!legacyDoc.data().pinHash;
-                    }catch(e){}
-
-                    if(legacyExists){
-                        showLoginError("To konto działa jeszcze na starym systemie logowania. Przełącz się na \"Zakładam konto\" i zaloguj się tym samym loginem i PIN-em, żeby bezpiecznie przenieść dane.");
-                    }else{
-                        showLoginError("Nie ma takiego konta lub PIN jest nieprawidłowy.");
-                    }
-
+                    showLoginError("Nie ma takiego konta lub PIN jest nieprawidłowy.");
                 }else{
                     showLoginError("Błąd połączenia z serwerem. Spróbuj ponownie.");
                 }
@@ -562,11 +615,31 @@ async function completeLogin(user){
     window.LZPN_REFEREE_NAME = data.refereeName || currentUsername || "Sędzia";
 
     if(firebaseReady){
+
         db.collection("users").doc(user.uid).update({
             lastLogin: firebase.firestore.FieldValue.serverTimestamp()
         }).catch(err=>{
             console.warn("Nie udało się zapisać czasu logowania.", err);
         });
+
+        if(currentUsername){
+
+            db.collection("usernames").doc(currentUsername).get().then(unameDoc=>{
+
+                if(!unameDoc.exists){
+
+                    db.collection("usernames").doc(currentUsername).set({
+                        email: user.email,
+                        uid: user.uid
+                    }).catch(err=>{
+                        console.warn("Nie udało się zapisać mapowania loginu.", err);
+                    });
+                }
+
+            }).catch(err=>{
+                console.warn("Nie udało się sprawdzić mapowania loginu.", err);
+            });
+        }
     }
 
     const { modal } = getLoginEls();
@@ -592,6 +665,47 @@ async function completeLogin(user){
     if(readyCallback){
         readyCallback();
         readyCallback = null;
+    }
+}
+
+async function handleForgotPin(){
+
+    if(!firebaseReady){
+        alert("Brak połączenia z serwerem. Spróbuj ponownie później.");
+        return;
+    }
+
+    const username = sanitizeUsername(
+        prompt("Podaj swój login, żeby otrzymać link do zresetowania PIN-u:") || ""
+    );
+
+    if(!username) return;
+
+    try{
+
+        const email = await lookupEmailForUsername(username);
+
+        if(!email){
+            alert("Nie znaleziono konta o takim loginie.");
+            return;
+        }
+
+        if(isSyntheticEmail(email)){
+            alert(
+                "To konto nie ma jeszcze zapisanego prawdziwego adresu e-mail, więc nie możemy wysłać linku resetującego. " +
+                "Zaloguj się normalnie i w sekcji \"Konto\" dopisz swój e-mail, żeby ta opcja zadziałała w przyszłości."
+            );
+            return;
+        }
+
+        await auth.sendPasswordResetEmail(email);
+
+        alert(`Wysłaliśmy link do zresetowania PIN-u na adres ${email}. Sprawdź skrzynkę (także SPAM).`);
+
+    }catch(err){
+
+        console.error(err);
+        alert("Nie udało się wysłać linku resetującego. Spróbuj ponownie później.");
     }
 }
 
@@ -734,8 +848,8 @@ async function handleChangePin(){
     const newPin = newPinInput.value.trim();
     const newPinConfirm = newPinConfirmInput.value.trim();
 
-    if(!/^\d{6,8}$/.test(newPin)){
-        showFieldError(pinChangeError, "Nowy PIN musi mieć 6-8 cyfr.");
+    if(newPin.length < 6){
+        showFieldError(pinChangeError, "Nowy PIN/hasło musi mieć min. 6 znaków.");
         return;
     }
 
@@ -749,8 +863,7 @@ async function handleChangePin(){
 
     try{
 
-        const email = usernameToEmail(currentUsername);
-        const cred = firebase.auth.EmailAuthProvider.credential(email, currentPin);
+        const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPin);
 
         await user.reauthenticateWithCredential(cred);
         await user.updatePassword(newPin);
@@ -776,6 +889,80 @@ async function handleChangePin(){
         changePinBtn.disabled = false;
         changePinBtn.innerHTML = "<i class=\"fa-solid fa-key\"></i> Zmień PIN";
     }
+}
+
+async function handleSaveAccountEmail(){
+
+    const input = document.getElementById("accountEmailInput");
+    const errorEl = document.getElementById("accountEmailError");
+    const btn = document.getElementById("saveAccountEmailBtn");
+
+    clearFieldError(errorEl);
+
+    const user = auth ? auth.currentUser : null;
+
+    if(!firebaseReady || !user){
+        showFieldError(errorEl, "Brak połączenia z serwerem.");
+        return;
+    }
+
+    const newEmail = input.value.trim();
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)){
+        showFieldError(errorEl, "Podaj prawidłowy adres e-mail.");
+        return;
+    }
+
+    const currentPin = prompt("Podaj swój obecny PIN/hasło, żeby potwierdzić zmianę e-maila:");
+
+    if(!currentPin) return;
+
+    btn.disabled = true;
+    btn.textContent = "Zapisuję...";
+
+    try{
+
+        const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPin);
+        await user.reauthenticateWithCredential(cred);
+
+        await user.updateEmail(newEmail);
+
+        await db.collection("users").doc(user.uid).update({ email: newEmail });
+
+        if(currentUsername){
+            await db.collection("usernames").doc(currentUsername).set({
+                email: newEmail,
+                uid: user.uid
+            });
+        }
+
+        showToastSafe("E-mail zapisany");
+        input.value = "";
+
+    }catch(err){
+
+        console.error(err);
+
+        if(err.code === "auth/wrong-password" || err.code === "auth/invalid-credential"){
+            showFieldError(errorEl, "Nieprawidłowy PIN.");
+        }else if(err.code === "auth/email-already-in-use"){
+            showFieldError(errorEl, "Ten e-mail jest już używany przez inne konto.");
+        }else if(err.code === "auth/invalid-email"){
+            showFieldError(errorEl, "Nieprawidłowy adres e-mail.");
+        }else{
+            showFieldError(errorEl, "Błąd połączenia. Spróbuj ponownie.");
+        }
+
+    }finally{
+
+        btn.disabled = false;
+        btn.textContent = "Zapisz e-mail";
+    }
+}
+
+const saveAccountEmailBtn = document.getElementById("saveAccountEmailBtn");
+if(saveAccountEmailBtn){
+    saveAccountEmailBtn.addEventListener("click", handleSaveAccountEmail);
 }
 
 async function handleDeleteAccount(){
@@ -811,12 +998,20 @@ async function handleDeleteAccount(){
 
     try{
 
-        const email = usernameToEmail(currentUsername);
-        const cred = firebase.auth.EmailAuthProvider.credential(email, pin);
+        const cred = firebase.auth.EmailAuthProvider.credential(user.email, pin);
 
         await user.reauthenticateWithCredential(cred);
 
         await db.collection("users").doc(user.uid).delete();
+
+        if(currentUsername){
+            try{
+                await db.collection("usernames").doc(currentUsername).delete();
+            }catch(e){
+                console.warn("Nie udało się usunąć mapowania loginu.", e);
+            }
+        }
+
         await user.delete();
 
         localStorage.removeItem(LOCAL_CACHE_PREFIX + user.uid);
