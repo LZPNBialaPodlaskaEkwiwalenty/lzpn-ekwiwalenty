@@ -2415,11 +2415,14 @@ body.modal-open{
 
     background:linear-gradient(
         135deg,
-        var(--gold),
-        var(--gold-light)
+        #141414 0%,
+        #2b2306 55%,
+        #4a3b0f 100%
     );
 
-    color:#111;
+    border:1px solid rgba(212,175,55,.45);
+
+    color:var(--gold-light,#f0cf66);
     font-weight:700;
 
     padding:14px 20px;
@@ -2428,6 +2431,15 @@ body.modal-open{
 }
 
 .add-match-from-table-btn:hover{
+
+    background:linear-gradient(
+        135deg,
+        #1a1a1a 0%,
+        #3a2f0c 55%,
+        #6b5714 100%
+    );
+
+    border-color:var(--gold);
     transform:translateY(-2px);
     box-shadow:0 10px 25px rgba(212,175,55,.25);
 }
@@ -2620,19 +2632,11 @@ body.modal-open{
     cursor:not-allowed;
 }
 
-.import-obsady-btn{
-
-    background:#181818;
-    color:white;
-    border:1px solid rgba(255,255,255,.08);
-}
-
-.import-obsady-btn:hover{
-    border-color:var(--gold);
-    color:var(--gold);
-    box-shadow:none;
-    transform:translateY(-2px);
-}
+/* .import-obsady-btn: celowo bez własnych stylów -
+   przyciski "Importuj z Obsad" / "Generuj PDF" mają
+   wyglądać identycznie jak "Dodaj mecz" (ten sam
+   złoto-czarny gradient), więc dziedziczą wszystko
+   z .add-match-from-table-btn. */
 
 /* =========================
    IMPORT Z OBSAD
