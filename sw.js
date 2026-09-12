@@ -9,7 +9,7 @@
    dało się otworzyć bez zasięgu.
 ====================================== */
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const APP_SHELL_CACHE = "lzpn-ekwiwalenty-shell-" + CACHE_VERSION;
 const RUNTIME_CACHE = "lzpn-ekwiwalenty-runtime-" + CACHE_VERSION;
 
@@ -77,8 +77,11 @@ self.addEventListener("fetch", (event) => {
     }
 
     if (isSameOrigin) {
-        // Własne pliki: cache-first, w tle odświeżamy z sieci.
-        event.respondWith(cacheFirst(request, APP_SHELL_CACHE));
+        // Własne pliki (HTML/CSS/JS): zawsze najpierw sieć, żeby
+        // po każdej aktualizacji strony wystarczyło samo odświeżenie
+        // (bez wylogowywania / zamykania karty). Cache to tylko
+        // zapasowa kopia na wypadek braku internetu.
+        event.respondWith(networkFirst(request, APP_SHELL_CACHE));
     } else {
         // Zewnętrzne biblioteki (fonty, ikony, PDF): network-first
         // z zapasem z cache, gdy nie ma internetu.
@@ -86,46 +89,11 @@ self.addEventListener("fetch", (event) => {
     }
 });
 
-async function cacheFirst(request, cacheName) {
-
-    const cached = await caches.match(request);
-
-    const networkFetch = fetch(request)
-        .then((response) => {
-            if (response && response.status === 200) {
-                const clone = response.clone();
-                caches
-                    .open(cacheName)
-                    .then((cache) => cache.put(request, clone));
-            }
-            return response;
-        })
-        .catch(() => null);
-
-    // Zwróć od razu wersję z cache, jeśli jest - a sieć niech
-    // ją sobie w tle zaktualizuje na następny raz.
-    if (cached) {
-        networkFetch;
-        return cached;
-    }
-
-    const fresh = await networkFetch;
-
-    if (fresh) return fresh;
-
-    // Ostateczny fallback dla nawigacji, gdy nic nie działa.
-    if (request.mode === "navigate") {
-        return caches.match("./index.html");
-    }
-
-    return new Response("", { status: 504, statusText: "Offline" });
-}
-
 async function networkFirst(request, cacheName) {
 
     try {
 
-        const response = await fetch(request);
+        const response = await fetch(request, { cache: "no-store" });
 
         if (response && response.status === 200) {
             const clone = response.clone();
@@ -141,6 +109,10 @@ async function networkFirst(request, cacheName) {
         const cached = await caches.match(request);
 
         if (cached) return cached;
+
+        if (request.mode === "navigate") {
+            return caches.match("./index.html");
+        }
 
         return new Response("", { status: 504, statusText: "Offline" });
     }

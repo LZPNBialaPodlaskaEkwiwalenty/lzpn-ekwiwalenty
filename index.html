@@ -1092,5 +1092,41 @@
 
 <script src="auth.js"></script>
 <script src="script.js"></script>
+
+<script>
+/* ======================================
+   REJESTRACJA SERVICE WORKERA (PWA)
+   + automatyczne odświeżenie po
+   wgraniu nowej wersji aplikacji,
+   żeby wystarczyło samo odświeżenie
+   strony (bez wylogowywania).
+====================================== */
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker
+            .register("./sw.js")
+            .then((reg) => {
+                reg.update();
+            })
+            .catch((err) => {
+                console.warn("Nie udało się zarejestrować Service Workera:", err);
+            });
+
+    });
+
+    let swRefreshing = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+
+        if (swRefreshing) return;
+
+        swRefreshing = true;
+        window.location.reload();
+    });
+}
+</script>
+
 </body>
 </html>
