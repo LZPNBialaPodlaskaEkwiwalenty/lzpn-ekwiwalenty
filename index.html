@@ -159,6 +159,11 @@
         <a href="https://lzpn.pl/2026/08/05/tabela-ekwiwalentow-sedziowskich-ks-lzpn-sezon-2026-2027/" target="_blank">
             Aktualne stawki
         </a>
+
+        <button type="button" id="openOnboardingBtn" class="onboarding-link-btn">
+            <i class="fa-solid fa-circle-info"></i>
+            Jak szybko dodać mecze?
+        </button>
     </div>
 </header>
 
@@ -262,6 +267,20 @@
         </div>
 
         <div id="calendarGrid" class="calendar-grid"></div>
+
+        <div class="table-actions-row calendar-actions-row">
+
+            <button id="addMatchUnderCalendarBtn" class="add-match-from-table-btn">
+                <i class="fa-solid fa-plus"></i>
+                Dodaj mecz
+            </button>
+
+            <button id="pdfBtnUnderCalendar" class="add-match-from-table-btn import-obsady-btn">
+                <i class="fa-solid fa-file-pdf"></i>
+                Generuj PDF
+            </button>
+
+        </div>
 
     </section>
 
@@ -603,6 +622,71 @@
         <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com?subject=Brakuj%C4%85ca%20dru%C5%BCyna%20w%20aplikacji%20Ekwiwalenty">Zgłoś problem</a>
     </span>
 </footer>
+
+<div id="onboardingModal" class="modal">
+
+    <div class="modal-content glass onboarding-modal">
+
+        <div class="modal-header">
+            <h2>Jak szybko dodać mecze</h2>
+            <button id="closeOnboardingModal" aria-label="Zamknij instrukcję">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="onboarding-steps">
+
+            <div class="onboarding-step active" data-step="1">
+                <p class="onboarding-step-text">
+                    <strong>Krok 1.</strong> Zaloguj się do Extranetu PZPN, otwórz tabelę
+                    Obsad i zaznacz całe wiersze swoich meczów — od ligi, przez kolejkę,
+                    datę, drużyny, miejsce, aż po wynik.
+                </p>
+                <img src="instr1.png" alt="Zaznaczanie wierszy w tabeli Obsad" class="onboarding-img">
+            </div>
+
+            <div class="onboarding-step" data-step="2">
+                <p class="onboarding-step-text">
+                    <strong>Krok 2.</strong> Skopiuj (Ctrl+C), wejdź w tej aplikacji w
+                    "Importuj z Obsad" (pod tabelą meczów) i wklej (Ctrl+V) do pola tekstowego.
+                </p>
+                <img src="instr2.png" alt="Wklejony tekst w oknie importu" class="onboarding-img">
+            </div>
+
+            <div class="onboarding-step" data-step="3">
+                <p class="onboarding-step-text">
+                    <strong>Krok 3.</strong> Kliknij "Wczytaj mecze" — system sam rozpozna daty,
+                    drużyny i ligi. Sprawdź rolę (Główny/Asystent) przy każdym meczu, popraw
+                    nierozpoznane ligi, i zaimportuj zaznaczone.
+                </p>
+                <img src="instr3.png" alt="Podgląd rozpoznanych meczów przed importem" class="onboarding-img">
+            </div>
+
+        </div>
+
+        <div class="onboarding-nav">
+
+            <button id="onboardingPrevBtn" class="dark-btn" disabled>
+                <i class="fa-solid fa-chevron-left"></i>
+                Wstecz
+            </button>
+
+            <div class="onboarding-dots">
+                <span class="onboarding-dot active" data-dot="1"></span>
+                <span class="onboarding-dot" data-dot="2"></span>
+                <span class="onboarding-dot" data-dot="3"></span>
+            </div>
+
+            <button id="onboardingNextBtn" class="gold-btn">
+                Dalej
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 <div id="importObsadyModal" class="modal">
 

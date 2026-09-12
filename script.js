@@ -2324,9 +2324,98 @@ function startApp(){
     showToast(
         "Aplikacja gotowa"
     );
+
+    maybeShowOnboarding();
 }
 
 window.LZPN_AUTH.onReady(startApp);
+
+/* ======================================
+   INSTRUKCJA "JAK SZYBKO DODAĆ MECZE"
+====================================== */
+
+let onboardingStep = 1;
+const ONBOARDING_TOTAL_STEPS = 3;
+
+function updateOnboardingStep(){
+
+    document.querySelectorAll(".onboarding-step").forEach(el=>{
+        el.classList.toggle("active", Number(el.dataset.step) === onboardingStep);
+    });
+
+    document.querySelectorAll(".onboarding-dot").forEach(el=>{
+        el.classList.toggle("active", Number(el.dataset.dot) === onboardingStep);
+    });
+
+    document.getElementById("onboardingPrevBtn").disabled = onboardingStep === 1;
+
+    const nextBtn = document.getElementById("onboardingNextBtn");
+
+    nextBtn.innerHTML = onboardingStep === ONBOARDING_TOTAL_STEPS
+        ? "<i class=\"fa-solid fa-check\"></i> Rozumiem"
+        : "Dalej <i class=\"fa-solid fa-chevron-right\"></i>";
+}
+
+function openOnboardingModal(){
+    onboardingStep = 1;
+    updateOnboardingStep();
+    document.getElementById("onboardingModal").classList.add("active");
+}
+
+function closeOnboardingModal(){
+    document.getElementById("onboardingModal").classList.remove("active");
+}
+
+function maybeShowOnboarding(){
+
+    const username = window.LZPN_AUTH.getUsername();
+    if(!username) return;
+
+    const key = `lzpn_onboarding_seen_${username}`;
+
+    if(!localStorage.getItem(key)){
+        localStorage.setItem(key, "1");
+        openOnboardingModal();
+    }
+}
+
+document
+.getElementById("openOnboardingBtn")
+.addEventListener("click", openOnboardingModal);
+
+document
+.getElementById("closeOnboardingModal")
+.addEventListener("click", closeOnboardingModal);
+
+document
+.getElementById("onboardingPrevBtn")
+.addEventListener("click", ()=>{
+
+    if(onboardingStep > 1){
+        onboardingStep--;
+        updateOnboardingStep();
+    }
+});
+
+document
+.getElementById("onboardingNextBtn")
+.addEventListener("click", ()=>{
+
+    if(onboardingStep < ONBOARDING_TOTAL_STEPS){
+        onboardingStep++;
+        updateOnboardingStep();
+    }else{
+        closeOnboardingModal();
+    }
+});
+
+document
+.getElementById("addMatchUnderCalendarBtn")
+.addEventListener("click", addMatchFromTable);
+
+document
+.getElementById("pdfBtnUnderCalendar")
+.addEventListener("click", exportPDF);
 
 /* ======================================
    DANE SĘDZIEGO
