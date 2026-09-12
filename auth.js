@@ -919,6 +919,46 @@ async function handleChangePin(){
     }
 }
 
+async function populateAccountProfileSummary(){
+
+    const nameEl = document.getElementById("accountProfileName");
+    const loginEl = document.getElementById("accountProfileLogin");
+    const emailEl = document.getElementById("accountProfileEmail");
+    const sinceEl = document.getElementById("accountProfileSince");
+
+    if(!nameEl) return;
+
+    nameEl.textContent = window.LZPN_REFEREE_NAME || "Sędzia";
+    loginEl.textContent = currentUsername ? `@${currentUsername}` : "—";
+    emailEl.textContent = "Wczytywanie...";
+    sinceEl.textContent = "Konto od: —";
+
+    if(!firebaseReady || !currentUserUid) return;
+
+    try{
+
+        const doc = await db.collection("users").doc(currentUserUid).get();
+        const data = doc.data() || {};
+
+        const email = data.email;
+        emailEl.textContent = (email && !isSyntheticEmail(email))
+            ? email
+            : "Brak zapisanego e-maila";
+
+        if(data.createdAt && typeof data.createdAt.toDate === "function"){
+            sinceEl.textContent = `Konto od: ${data.createdAt.toDate().toLocaleDateString("pl-PL")}`;
+        }else{
+            sinceEl.textContent = "Konto od: —";
+        }
+
+    }catch(err){
+        console.warn("Nie udało się wczytać danych profilu.", err);
+        emailEl.textContent = "Błąd wczytywania";
+    }
+}
+
+window.LZPN_POPULATE_ACCOUNT_SUMMARY = populateAccountProfileSummary;
+
 async function handleSaveAccountEmail(){
 
     const input = document.getElementById("accountEmailInput");

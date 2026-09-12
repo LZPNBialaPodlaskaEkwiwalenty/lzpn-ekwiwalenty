@@ -2397,6 +2397,10 @@ document
     "click",
     ()=>{
 
+        if(typeof window.LZPN_POPULATE_ACCOUNT_SUMMARY === "function"){
+            window.LZPN_POPULATE_ACCOUNT_SUMMARY();
+        }
+
         document
             .getElementById(
                 "refereeModal"

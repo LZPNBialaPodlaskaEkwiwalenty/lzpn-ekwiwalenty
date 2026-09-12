@@ -723,13 +723,42 @@
             </button>
         </div>
 
+        <div class="account-profile-summary">
+
+            <div class="account-profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <div class="account-profile-details">
+
+                <h3 id="accountProfileName">Sędzia</h3>
+
+                <div class="account-profile-row">
+                    <i class="fa-solid fa-at"></i>
+                    <span id="accountProfileLogin">—</span>
+                </div>
+
+                <div class="account-profile-row">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span id="accountProfileEmail">Brak zapisanego e-maila</span>
+                </div>
+
+                <div class="account-profile-row">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span id="accountProfileSince">Konto od: —</span>
+                </div>
+
+            </div>
+
+        </div>
+
         <div class="account-section">
 
-            <h3>Dane sędziego</h3>
+            <h3><i class="fa-solid fa-id-card"></i> Imię i nazwisko</h3>
 
             <div class="form-group">
 
-                <label>Imię i nazwisko</label>
+                <label>Wyświetlane imię i nazwisko</label>
 
                 <input
                     type="text"
@@ -750,15 +779,15 @@
 
         <div class="account-section">
 
-            <h3>E-mail (do resetu PIN-u)</h3>
+            <h3><i class="fa-solid fa-envelope"></i> E-mail</h3>
 
             <p class="danger-text">
-                Jeśli zakładałeś konto zanim dodaliśmy tę opcję, dopisz swój e-mail,
-                żeby móc skorzystać z "Zapomniałeś PIN-u?" na ekranie logowania.
+                Potrzebny do "Zapomniałeś PIN-u/hasła?" na ekranie logowania.
+                Zmiana wymaga potwierdzenia linkiem wysłanym na nowy adres.
             </p>
 
             <div class="form-group">
-                <label>Twój e-mail</label>
+                <label>Nowy e-mail</label>
                 <input
                     type="email"
                     id="accountEmailInput"
@@ -776,7 +805,7 @@
 
         <div class="account-section">
 
-            <h3>Zmiana PIN-u / hasła</h3>
+            <h3><i class="fa-solid fa-key"></i> Zmiana PIN-u / hasła</h3>
 
             <div class="form-group">
                 <label>Aktualny PIN / hasło</label>
@@ -804,7 +833,7 @@
 
         <div id="adminTeamsSection" class="account-section" style="display:none;">
 
-            <h3>Zgłoszone drużyny (panel administratora)</h3>
+            <h3><i class="fa-solid fa-shield-halved"></i> Zgłoszone drużyny (panel administratora)</h3>
 
             <p class="danger-text">
                 Widoczne tylko na Twoim koncie. Zaakceptowane drużyny pojawią się
@@ -819,7 +848,7 @@
 
         <div class="account-section danger-zone">
 
-            <h3>Usuń konto</h3>
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> Usuń konto</h3>
 
             <p class="danger-text">
                 Usunie login, PIN oraz wszystkie zapisane mecze z chmury.

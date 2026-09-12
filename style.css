@@ -1561,9 +1561,90 @@ body.modal-open{
 
 .account-modal{
 
-    max-width:480px;
+    max-width:640px;
     max-height:85vh;
     overflow-y:auto;
+}
+
+.account-profile-summary{
+
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+    padding:18px;
+    margin-bottom:22px;
+
+    border-radius:16px;
+
+    background:linear-gradient(135deg, rgba(212,175,55,.12), rgba(212,175,55,.03));
+    border:1px solid rgba(212,175,55,.3);
+}
+
+.account-profile-avatar{
+
+    flex-shrink:0;
+
+    width:64px;
+    height:64px;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg, var(--gold), var(--gold-light));
+    color:#111;
+    font-size:1.6rem;
+}
+
+.account-profile-details{
+    min-width:0;
+}
+
+.account-profile-details h3{
+
+    margin:0 0 8px 0;
+    font-size:1.15rem;
+    color:var(--white);
+}
+
+.account-profile-row{
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    font-size:.85rem;
+    color:var(--muted);
+
+    margin-bottom:4px;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.account-profile-row i{
+
+    color:var(--gold);
+    width:14px;
+    flex-shrink:0;
+}
+
+.account-section h3{
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    color:var(--gold-light,#f0cf66);
+    font-size:1rem;
+    margin-bottom:14px;
+}
+
+.account-section h3 i{
+    color:var(--gold);
 }
 
 .account-section{
@@ -1576,13 +1657,6 @@ body.modal-open{
 
     border-top:none;
     padding-top:0;
-}
-
-.account-section h3{
-
-    color:var(--gold-light,#f0cf66);
-    font-size:1rem;
-    margin-bottom:14px;
 }
 
 .account-section > button{
