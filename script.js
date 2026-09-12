@@ -9,6 +9,19 @@
 ====================================== */
 
 const STORAGE_KEY = "lzpn_biala_podlaska_ekwiwalenty";
+
+function escapeHtml(str){
+
+    if(str === null || str === undefined) return "";
+
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 const DEFAULT_TEAMS = [
     "Orzeł Czemierniki",
     "ŁKS Łazy",
@@ -509,7 +522,7 @@ const matchesCount =
 
             return `
                 <div class="calendar-match-line ${roleClass}">
-                    <span class="role-tag">${roleAbbr}:</span>${match.homeTeam} - ${match.awayTeam}
+                    <span class="role-tag">${roleAbbr}:</span>${escapeHtml(match.homeTeam)} - ${escapeHtml(match.awayTeam)}
                 </div>
             `;
 
@@ -732,11 +745,11 @@ function renderDayMatchesList(date){
         card.innerHTML = `
 
             <div class="day-match-title">
-                ${match.homeTeam} - ${match.awayTeam}
+                ${escapeHtml(match.homeTeam)} - ${escapeHtml(match.awayTeam)}
             </div>
 
             <div>
-                ${match.league} • ${match.role}
+                ${escapeHtml(match.league)} • ${escapeHtml(match.role)}
             </div>
 
             <div style="margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -1037,18 +1050,18 @@ function renderImportPreview(){
         rowEl.innerHTML = `
             <input type="checkbox" class="import-row-check" data-index="${index}" checked>
             <span class="import-row-date">${dateDisplay}</span>
-            <span class="import-row-teams">${row.homeTeam} - ${row.awayTeam}</span>
+            <span class="import-row-teams">${escapeHtml(row.homeTeam)} - ${escapeHtml(row.awayTeam)}</span>
             <select class="import-row-league" data-index="${index}">
                 <option value="">- wybierz ligę -</option>
                 ${leagueOptions.map(l =>
-                    `<option value="${l}" ${l === row.league ? "selected" : ""}>${l}</option>`
+                    `<option value="${escapeHtml(l)}" ${l === row.league ? "selected" : ""}>${escapeHtml(l)}</option>`
                 ).join("")}
             </select>
             <span class="import-row-role">
                 <button type="button" class="role-main-btn active" data-index="${index}">Główny</button>
                 <button type="button" class="role-assist-btn" data-index="${index}">Asystent</button>
             </span>
-            ${!row.league ? `<span class="import-row-warning">Nie rozpoznano ligi "${row.leagueRaw}" - wybierz ręcznie</span>` : ""}
+            ${!row.league ? `<span class="import-row-warning">Nie rozpoznano ligi "${escapeHtml(row.leagueRaw)}" - wybierz ręcznie</span>` : ""}
         `;
 
         container.appendChild(rowEl);
@@ -1501,20 +1514,20 @@ function renderMatchesTable(){
 
             <td class="row-summary" data-label="">
                 <span class="row-summary-text">
-                    ${formatDisplayDate(match.date)} • ${match.league}: ${match.homeTeam} - ${match.awayTeam}
+                    ${formatDisplayDate(match.date)} • ${escapeHtml(match.league)}: ${escapeHtml(match.homeTeam)} - ${escapeHtml(match.awayTeam)}
                 </span>
                 <i class="fa-solid fa-chevron-down row-summary-chevron"></i>
             </td>
 
             <td data-label="Data">${formatDisplayDate(match.date)}</td>
 
-            <td data-label="Rozgrywki">${match.league}</td>
+            <td data-label="Rozgrywki">${escapeHtml(match.league)}</td>
 
-            <td data-label="Rola">${match.role}</td>
+            <td data-label="Rola">${escapeHtml(match.role)}</td>
 
-            <td data-label="Gospodarz">${match.homeTeam}</td>
+            <td data-label="Gospodarz">${escapeHtml(match.homeTeam)}</td>
 
-            <td data-label="Goście">${match.awayTeam}</td>
+            <td data-label="Goście">${escapeHtml(match.awayTeam)}</td>
 
             <td data-label="Kwota">${match.amount} zł</td>
 
@@ -1579,7 +1592,7 @@ function renderMatchesTable(){
                 <button
                     class="action-btn edit-btn"
                     onclick="openEditModal(${match.id})"
-                    aria-label="Edytuj mecz ${match.homeTeam} - ${match.awayTeam}"
+                    aria-label="Edytuj mecz ${escapeHtml(match.homeTeam)} - ${escapeHtml(match.awayTeam)}"
                 >
                     <i class="fa-solid fa-pen"></i>
                 </button>
@@ -1591,7 +1604,7 @@ function renderMatchesTable(){
                 <button
                     class="action-btn delete-btn"
                     onclick="deleteMatch(${match.id})"
-                    aria-label="Usuń mecz ${match.homeTeam} - ${match.awayTeam}"
+                    aria-label="Usuń mecz ${escapeHtml(match.homeTeam)} - ${escapeHtml(match.awayTeam)}"
                 >
                     <i class="fa-solid fa-trash"></i>
                 </button>

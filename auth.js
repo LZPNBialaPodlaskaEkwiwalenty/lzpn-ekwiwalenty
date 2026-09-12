@@ -23,6 +23,18 @@ function usernameToEmail(username){
     return username + "@" + EMAIL_DOMAIN;
 }
 
+function escapeHtml(str){
+
+    if(str === null || str === undefined) return "";
+
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 async function hashPin(pin, username){
 
     const data =
@@ -1185,8 +1197,8 @@ function renderAdminTeamsSection(pending){
 
         row.innerHTML = `
             <span class="pending-team-name">
-                ${item.name}
-                <span class="pending-team-meta">zgłosił: ${item.by || "?"} ${date ? "- " + date : ""}</span>
+                ${escapeHtml(item.name)}
+                <span class="pending-team-meta">zgłosił: ${escapeHtml(item.by) || "?"} ${date ? "- " + date : ""}</span>
             </span>
             <span class="pending-team-actions">
                 <button type="button" class="approve-team-btn">Akceptuj</button>
@@ -1273,8 +1285,8 @@ function renderTeamsAdminList(filterText){
         row.className = "teams-admin-item";
 
         row.innerHTML = `
-            <span>${name}</span>
-            <button type="button" aria-label="Usuń drużynę ${name}">
+            <span>${escapeHtml(name)}</span>
+            <button type="button" aria-label="Usuń drużynę ${escapeHtml(name)}">
                 <i class="fa-solid fa-trash"></i>
             </button>
         `;
@@ -1528,7 +1540,7 @@ async function openUsersAdminModal(){
 
             row.innerHTML = `
                 <span class="pending-team-name">
-                    ${u.refereeName || "(brak imienia)"} — @${u.username || "?"}
+                    ${escapeHtml(u.refereeName) || "(brak imienia)"} — @${escapeHtml(u.username) || "?"}
                     <span class="pending-team-meta">
                         Ostatnie logowanie: ${formatAdminTimestamp(u.lastLogin)} •
                         Konto od: ${formatAdminTimestamp(u.createdAt)} •
