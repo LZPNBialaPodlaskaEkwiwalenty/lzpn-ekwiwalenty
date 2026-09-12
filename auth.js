@@ -6,6 +6,8 @@
 
 const LOCAL_CACHE_PREFIX = "lzpn_cache_";
 const EMAIL_DOMAIN = "lzpn-ekwiwalenty.local";
+const SESSION_STARTED_KEY = "lzpn_session_started_at";
+const SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 let currentUsername = null;
 let currentUserUid = null;
@@ -272,7 +274,29 @@ try{
         if(handlingExplicitAuth) return;
 
         if(user){
-            await completeLogin(user);
+
+            const storedRaw = localStorage.getItem(SESSION_STARTED_KEY);
+
+            if(!storedRaw){
+
+                localStorage.setItem(SESSION_STARTED_KEY, Date.now().toString());
+                await completeLogin(user);
+
+            }else{
+
+                const age = Date.now() - parseInt(storedRaw, 10);
+
+                if(age > SESSION_MAX_AGE_MS){
+
+                    localStorage.removeItem(SESSION_STARTED_KEY);
+                    await auth.signOut();
+
+                }else{
+
+                    await completeLogin(user);
+                }
+            }
+
         }else{
             showLoginModal();
         }
@@ -441,6 +465,7 @@ async function handleLoginSubmit(){
                 }
             }
 
+            localStorage.setItem(SESSION_STARTED_KEY, Date.now().toString());
             await completeLogin(cred.user);
 
         }else{
@@ -448,6 +473,7 @@ async function handleLoginSubmit(){
             try{
 
                 const cred = await auth.signInWithEmailAndPassword(email, pin);
+                localStorage.setItem(SESSION_STARTED_KEY, Date.now().toString());
                 await completeLogin(cred.user);
 
             }catch(err){
@@ -581,6 +607,8 @@ function hideLoadingOverlay(){
 }
 
 async function logout(){
+
+    localStorage.removeItem(SESSION_STARTED_KEY);
 
     try{
         if(auth) await auth.signOut();
@@ -780,6 +808,7 @@ async function handleDeleteAccount(){
         await user.delete();
 
         localStorage.removeItem(LOCAL_CACHE_PREFIX + user.uid);
+        localStorage.removeItem(SESSION_STARTED_KEY);
 
         window.location.reload();
 
