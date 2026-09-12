@@ -1495,7 +1495,16 @@ function renderMatchesTable(){
         const row =
             document.createElement("tr");
 
+        row.className = "match-row";
+
         row.innerHTML = `
+
+            <td class="row-summary" data-label="">
+                <span class="row-summary-text">
+                    ${formatDisplayDate(match.date)} • ${match.league}: ${match.homeTeam} - ${match.awayTeam}
+                </span>
+                <i class="fa-solid fa-chevron-down row-summary-chevron"></i>
+            </td>
 
             <td data-label="Data">${formatDisplayDate(match.date)}</td>
 
@@ -1594,6 +1603,12 @@ function renderMatchesTable(){
         row.addEventListener("dblclick",()=>{
 
             toggleSettled(match.id);
+
+        });
+
+        row.querySelector(".row-summary").addEventListener("click", ()=>{
+
+            row.classList.toggle("expanded");
 
         });
 
