@@ -634,11 +634,29 @@ async function completeLogin(user){
                     }).catch(err=>{
                         console.warn("Nie udało się zapisać mapowania loginu.", err);
                     });
+
+                }else if(unameDoc.data().email !== user.email){
+
+                    db.collection("usernames").doc(currentUsername).set({
+                        email: user.email,
+                        uid: user.uid
+                    }).catch(err=>{
+                        console.warn("Nie udało się zaktualizować mapowania loginu.", err);
+                    });
                 }
 
             }).catch(err=>{
                 console.warn("Nie udało się sprawdzić mapowania loginu.", err);
             });
+
+            if(data.email !== user.email){
+
+                db.collection("users").doc(user.uid).update({
+                    email: user.email
+                }).catch(err=>{
+                    console.warn("Nie udało się zaktualizować e-maila w profilu.", err);
+                });
+            }
         }
     }
 
@@ -925,18 +943,13 @@ async function handleSaveAccountEmail(){
         const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPin);
         await user.reauthenticateWithCredential(cred);
 
-        await user.updateEmail(newEmail);
+        await user.verifyBeforeUpdateEmail(newEmail);
 
-        await db.collection("users").doc(user.uid).update({ email: newEmail });
-
-        if(currentUsername){
-            await db.collection("usernames").doc(currentUsername).set({
-                email: newEmail,
-                uid: user.uid
-            });
-        }
-
-        showToastSafe("E-mail zapisany");
+        showToastSafe("Wysłaliśmy link weryfikacyjny na nowy adres");
+        alert(
+            `Sprawdź skrzynkę ${newEmail} i kliknij link weryfikacyjny, żeby dokończyć zmianę e-maila. ` +
+            "Twój login i PIN pozostają bez zmian - e-mail w aplikacji zaktualizuje się automatycznie po weryfikacji, przy najbliższym logowaniu."
+        );
         input.value = "";
 
     }catch(err){
