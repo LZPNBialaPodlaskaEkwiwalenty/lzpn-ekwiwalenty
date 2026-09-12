@@ -47,7 +47,7 @@
 </div>
 
 <!-- EKRAN LOGOWANIA -->
-<div id="loginModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+<div id="loginModal" class="modal">
 
     <div class="modal-content glass login-content">
 
@@ -124,8 +124,8 @@
     <div class="logo-box">
         <img src="logo.png" alt="Logo KS Biała Podlaska" class="club-logo">
         <div>
-            <h1>Kalkulator wynagrodzeń sędziowskich</h1>
-            <span>LZPN: Biała Podlaska</span>
+            <h1>LZPN: Biała Podlaska</h1>
+            <span>Ekwiwalenty sędziowskie</span>
         </div>
     </div>
 
@@ -162,6 +162,11 @@
         Baza drużyn
     </button>
 
+    <button id="adminUsersPageBtn" class="dark-btn" style="display:none;">
+        <i class="fa-solid fa-users"></i>
+        Użytkownicy
+    </button>
+
     <button id="logoutBtn" class="dark-btn logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i>
         Wyloguj
@@ -195,7 +200,7 @@
 
         <div class="calendar-header">
 
-            <button id="prevMonth" aria-label="Poprzedni miesiąc">
+            <button id="prevMonth">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
 
@@ -222,7 +227,7 @@
 
             </div>
 
-            <button id="nextMonth" aria-label="Następny miesiąc">
+            <button id="nextMonth">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
 
@@ -409,7 +414,7 @@
 
 <!-- MODAL -->
 
-<div id="matchModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div id="matchModal" class="modal">
 
     <div class="modal-content glass">
 
@@ -581,12 +586,12 @@
     </span>
 </footer>
 
-<div id="importObsadyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="importObsadyModalTitle">
+<div id="importObsadyModal" class="modal">
 
     <div class="modal-content glass import-obsady-modal">
 
         <div class="modal-header">
-            <h2 id="importObsadyModalTitle">Importuj z Obsad</h2>
+            <h2>Importuj z Obsad</h2>
             <button id="closeImportObsadyModal" aria-label="Zamknij import">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -626,12 +631,31 @@
 
 </div>
 
-<div id="teamsAdminModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="teamsAdminModalTitle">
+<div id="usersAdminModal" class="modal">
 
     <div class="modal-content glass teams-admin-modal">
 
         <div class="modal-header">
-            <h2 id="teamsAdminModalTitle">Baza drużyn</h2>
+            <h2>Użytkownicy</h2>
+            <button id="closeUsersAdminModal" aria-label="Zamknij listę użytkowników">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p id="usersAdminCount" class="teams-admin-count"></p>
+
+        <div id="usersAdminList" class="teams-admin-list"></div>
+
+    </div>
+
+</div>
+
+<div id="teamsAdminModal" class="modal">
+
+    <div class="modal-content glass teams-admin-modal">
+
+        <div class="modal-header">
+            <h2>Baza drużyn</h2>
             <button id="closeTeamsAdminModal" aria-label="Zamknij bazę drużyn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -670,12 +694,12 @@
 
 </div>
 
-<div id="refereeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+<div id="refereeModal" class="modal">
 
     <div class="modal-content glass account-modal">
 
         <div class="modal-header">
-            <h2 id="accountModalTitle">Twoje konto</h2>
+            <h2>Twoje konto</h2>
             <button id="closeAccountModal" aria-label="Zamknij okno konta">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -779,7 +803,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
 
 
-<div id="dayModal" class="day-modal" role="dialog" aria-modal="true" aria-labelledby="dayModalDate">
+<div id="dayModal" class="day-modal">
 
     <div class="day-modal-content">
 
@@ -807,17 +831,5 @@
 
 <script src="auth.js"></script>
 <script src="script.js"></script>
-<script src="a11y.js"></script>
-<script>
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker
-                .register("./sw.js")
-                .catch((err) => {
-                    console.warn("Rejestracja Service Workera nie powiodła się:", err);
-                });
-        });
-    }
-</script>
 </body>
 </html>

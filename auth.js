@@ -523,6 +523,14 @@ async function completeLogin(user){
     window.LZPN_MATCHES_CACHE = data.matches || [];
     window.LZPN_REFEREE_NAME = data.refereeName || currentUsername || "Sędzia";
 
+    if(firebaseReady){
+        db.collection("users").doc(user.uid).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err=>{
+            console.warn("Nie udało się zapisać czasu logowania.", err);
+        });
+    }
+
     const { modal } = getLoginEls();
     if(modal) modal.classList.remove("active");
 
@@ -531,6 +539,11 @@ async function completeLogin(user){
 
     const badge = document.getElementById("currentUserBadge");
     if(badge) badge.textContent = `@${currentUsername}`;
+
+    if(currentUsername === ADMIN_USERNAME){
+        const usersBtn = document.getElementById("adminUsersPageBtn");
+        if(usersBtn) usersBtn.style.display = "inline-flex";
+    }
 
     hideLoadingOverlay();
 
@@ -1417,5 +1430,102 @@ const teamsAdminNewNameInput = document.getElementById("teamsAdminNewName");
 if(teamsAdminNewNameInput){
     teamsAdminNewNameInput.addEventListener("keydown", (e)=>{
         if(e.key === "Enter") addTeamToDb();
+    });
+}
+
+/* ======================================
+   LISTA UŻYTKOWNIKÓW (ADMIN)
+====================================== */
+
+function formatAdminTimestamp(ts){
+
+    if(!ts || typeof ts.toDate !== "function") return "-";
+
+    return ts.toDate().toLocaleString("pl-PL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+async function openUsersAdminModal(){
+
+    if(!firebaseReady) return;
+
+    const modal = document.getElementById("usersAdminModal");
+    if(modal) modal.classList.add("active");
+
+    const countEl = document.getElementById("usersAdminCount");
+    const listEl = document.getElementById("usersAdminList");
+
+    countEl.textContent = "Wczytywanie...";
+    listEl.innerHTML = "";
+
+    try{
+
+        const snapshot = await db.collection("users").get();
+
+        const users = [];
+
+        snapshot.forEach(doc=>{
+            users.push(doc.data());
+        });
+
+        users.sort((a, b)=>{
+
+            const aTime = a.lastLogin && a.lastLogin.toMillis ? a.lastLogin.toMillis() : 0;
+            const bTime = b.lastLogin && b.lastLogin.toMillis ? b.lastLogin.toMillis() : 0;
+
+            return bTime - aTime;
+        });
+
+        countEl.textContent = `${users.length} zarejestrowanych użytkowników`;
+
+        if(users.length === 0){
+            listEl.innerHTML = "<p class=\"pending-teams-empty\">Brak zarejestrowanych kont.</p>";
+            return;
+        }
+
+        listEl.innerHTML = "";
+
+        users.forEach(u=>{
+
+            const row = document.createElement("div");
+            row.className = "pending-team-item";
+
+            const matchCount = Array.isArray(u.matches) ? u.matches.length : 0;
+
+            row.innerHTML = `
+                <span class="pending-team-name">
+                    ${u.refereeName || "(brak imienia)"} — @${u.username || "?"}
+                    <span class="pending-team-meta">
+                        Ostatnie logowanie: ${formatAdminTimestamp(u.lastLogin)} •
+                        Konto od: ${formatAdminTimestamp(u.createdAt)} •
+                        Meczów: ${matchCount}
+                    </span>
+                </span>
+            `;
+
+            listEl.appendChild(row);
+        });
+
+    }catch(err){
+
+        console.error(err);
+        countEl.textContent = "Błąd wczytywania listy.";
+    }
+}
+
+const adminUsersPageBtn = document.getElementById("adminUsersPageBtn");
+if(adminUsersPageBtn){
+    adminUsersPageBtn.addEventListener("click", openUsersAdminModal);
+}
+
+const closeUsersAdminModalBtn = document.getElementById("closeUsersAdminModal");
+if(closeUsersAdminModalBtn){
+    closeUsersAdminModalBtn.addEventListener("click", ()=>{
+        document.getElementById("usersAdminModal").classList.remove("active");
     });
 }
