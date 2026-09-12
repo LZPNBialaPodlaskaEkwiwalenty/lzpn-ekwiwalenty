@@ -1,5 +1,5 @@
 /* ======================================
-   LZPN BIAŁA PODLASKA - EKWIWALENTY
+   LZPN - KALKULATOR SĘDZIOWSKI
    SCRIPT.JS
    CZĘŚĆ 1
 ====================================== */
@@ -1947,7 +1947,7 @@ async function exportPDF(){
                         columns:[
 
                             {
-                                text:"LZPN: Biała Podlaska – Ekwiwalenty sędziowskie",
+                                text:"Lubelski Związek Piłki Nożnej – Kalkulator sędziowski",
                                 fontSize:8,
                                 color:"#999999"
                             },

@@ -1,7 +1,7 @@
 {
-    "name": "LZPN Biała Podlaska - Ekwiwalenty",
-    "short_name": "Ekwiwalenty",
-    "description": "Rozliczanie ekwiwalentów sędziowskich - LZPN Biała Podlaska",
+    "name": "LZPN - Kalkulator sędziowski",
+    "short_name": "Kalkulator LZPN",
+    "description": "Rozliczanie ekwiwalentów sędziowskich - Lubelski Związek Piłki Nożnej",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",

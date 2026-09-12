@@ -1,5 +1,5 @@
 /* ======================================
-   LZPN BIAŁA PODLASKA - EKWIWALENTY
+   LZPN - KALKULATOR SĘDZIOWSKI
    AUTH.JS - logowanie (login + PIN)
    i synchronizacja danych w chmurze (Firebase)
 ====================================== */
