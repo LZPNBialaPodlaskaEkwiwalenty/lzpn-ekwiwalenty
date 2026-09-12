@@ -1929,6 +1929,8 @@ async function exportPDF(){
 
         return {
 
+            width:"*",
+
             table:{
 
                 widths:["*"],
@@ -1942,9 +1944,10 @@ async function exportPDF(){
                                 canvas:[{
                                     type:"rect",
                                     x:0, y:0,
-                                    w:150, h:3,
+                                    w:60, h:3,
                                     color: accentColor
-                                }]
+                                }],
+                                alignment:"center"
                             },
 
                             {
@@ -1952,6 +1955,7 @@ async function exportPDF(){
                                 fontSize:9,
                                 bold:true,
                                 color:"#666666",
+                                alignment:"center",
                                 margin:[0,8,0,4]
                             },
 
@@ -1959,7 +1963,8 @@ async function exportPDF(){
                                 text: `${value} zł`,
                                 fontSize:17,
                                 bold:true,
-                                color:"#1a1a1a"
+                                color:"#1a1a1a",
+                                alignment:"center"
                             }
 
                         ],
@@ -2013,7 +2018,7 @@ async function exportPDF(){
                                 margin:[12,2,0,0],
                                 stack:[
                                     {
-                                        text:"LZPN: BIAŁA PODLASKA",
+                                        text:"Lubelski Związek Piłki Nożnej",
                                         fontSize:15,
                                         bold:true,
                                         color:"#8a6a1a"
