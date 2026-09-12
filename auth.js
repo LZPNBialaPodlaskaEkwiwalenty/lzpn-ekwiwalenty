@@ -130,18 +130,24 @@ function setMode(mode){
         submitBtn.innerHTML =
             "<i class=\"fa-solid fa-user-plus\"></i> Załóż konto";
 
+        const usernameLabel = document.getElementById("loginUsernameLabel");
+        if(usernameLabel) usernameLabel.textContent = "Login";
+
     }else{
 
         fullNameGroup.style.display = "none";
         emailGroup.style.display = "none";
         subtitleEl.textContent =
-            "Podaj swój login i PIN.";
+            "Podaj swój login (lub e-mail) i PIN.";
 
         registerModeBtn.classList.remove("active");
         loginModeBtn.classList.add("active");
 
         submitBtn.innerHTML =
             "<i class=\"fa-solid fa-right-to-bracket\"></i> Zaloguj";
+
+        const usernameLabel = document.getElementById("loginUsernameLabel");
+        if(usernameLabel) usernameLabel.textContent = "Login lub e-mail";
     }
 }
 
@@ -532,7 +538,11 @@ async function handleLoginSubmit(){
 
             try{
 
-                const foundEmail = await lookupEmailForUsername(username);
+                const rawLoginInput = usernameInput.value.trim();
+
+                let foundEmail = rawLoginInput.includes("@")
+                    ? rawLoginInput
+                    : await lookupEmailForUsername(username);
 
                 if(!foundEmail){
 
