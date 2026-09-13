@@ -449,23 +449,6 @@ button{
     margin-top:5px;
 }
 
-.match-count-breakdown{
-
-    display:inline-block;
-    margin-left:8px;
-
-    font-size:.75em;
-    font-weight:700;
-}
-
-.count-settled{
-    color:#4caf50;
-}
-
-.count-unsettled{
-    color:#ff6b6b;
-}
-
 /* =========================
    FILTERS
 ========================= */

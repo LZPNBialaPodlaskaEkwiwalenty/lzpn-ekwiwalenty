@@ -1695,16 +1695,6 @@ function updateStatistics(){
     ).textContent =
         monthMatches.length;
 
-    document.getElementById(
-        "settledMatchCount"
-    ).textContent =
-        monthMatches.length - unsettledCount;
-
-    document.getElementById(
-        "unsettledMatchCount"
-    ).textContent =
-        unsettledCount;
-
     const avg =
         monthMatches.length > 0
             ? Math.round(total / monthMatches.length)
