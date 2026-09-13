@@ -342,15 +342,6 @@ const roleSelect =
 const calculatedAmount =
     document.getElementById("calculatedAmount");
 
-const customLeagueGroup =
-    document.getElementById("customLeagueGroup");
-
-const customLeagueNameInput =
-    document.getElementById("customLeagueName");
-
-const customLeagueRateInput =
-    document.getElementById("customLeagueRate");
-
 const searchInput =
     document.getElementById("searchInput");
 
@@ -436,16 +427,6 @@ function initializeSelects(){
         filterLeague.appendChild(option);
 
     });
-
-    const customLeagueOption =
-        document.createElement("option");
-
-    customLeagueOption.value = "__custom__";
-    customLeagueOption.textContent = "Inna liga / własna stawka";
-
-    leagueSelect.appendChild(customLeagueOption);
-
-    syncFilterLeagueOptions();
 
 }
 
@@ -647,10 +628,6 @@ function openAddModal(date){
     leagueSelect.selectedIndex = 0;
     roleSelect.selectedIndex = 0;
 
-    customLeagueNameInput.value = "";
-    customLeagueRateInput.value = "";
-
-    updateCustomLeagueVisibility();
     updateAmountPreview();
 
     modal.classList.add("active");
@@ -680,29 +657,12 @@ function openEditModal(id){
 
     setFormSettled(match.settled);
 
-    if(RATES[match.league]){
-
-        leagueSelect.value =
-            match.league;
-
-        customLeagueNameInput.value = "";
-        customLeagueRateInput.value = "";
-
-    }else{
-
-        leagueSelect.value = "__custom__";
-
-        customLeagueNameInput.value =
-            match.league;
-
-        customLeagueRateInput.value =
-            match.amount;
-    }
+    leagueSelect.value =
+        match.league;
 
     roleSelect.value =
         match.role;
 
-    updateCustomLeagueVisibility();
     updateAmountPreview();
 
     modal.classList.add("active");
@@ -1235,53 +1195,6 @@ function deleteMatchFromDay(id){
 }
 
 /* ======================================
-   LIGI WŁASNE (NIEROZPOZNANE)
-====================================== */
-
-function syncFilterLeagueOptions(){
-
-    const existing =
-        new Set(
-            Array.from(filterLeague.options)
-                .map(o => o.value)
-        );
-
-    const customLeagues =
-        Array.from(
-            new Set(
-                matches
-                    .map(m => m.league)
-                    .filter(l => l && !RATES[l] && !existing.has(l))
-            )
-        );
-
-    customLeagues.forEach(league=>{
-
-        const option =
-            document.createElement("option");
-
-        option.value = league;
-        option.textContent = league;
-
-        filterLeague.appendChild(option);
-    });
-}
-
-function updateCustomLeagueVisibility(){
-
-    const isCustom =
-        leagueSelect.value === "__custom__";
-
-    customLeagueGroup.classList.toggle(
-        "hidden",
-        !isCustom
-    );
-
-    customLeagueNameInput.required = isCustom;
-    customLeagueRateInput.required = isCustom;
-}
-
-/* ======================================
    EKWIWALENT
 ====================================== */
 
@@ -1292,16 +1205,6 @@ function calculateAmount(){
 
     const role =
         roleSelect.value;
-
-    if(league === "__custom__"){
-
-        const rate =
-            parseFloat(
-                customLeagueRateInput.value
-            );
-
-        return isNaN(rate) ? 0 : rate;
-    }
 
     if(
         !league ||
@@ -1363,9 +1266,7 @@ function saveMatch(event){
             ).value,
 
         league:
-            leagueSelect.value === "__custom__"
-                ? (customLeagueNameInput.value.trim() || "Inna liga")
-                : leagueSelect.value,
+            leagueSelect.value,
 
         role:
             roleSelect.value,
@@ -1408,8 +1309,6 @@ function saveMatch(event){
     }
 
     saveData();
-
-    syncFilterLeagueOptions();
 
     renderCalendar();
     renderMatchesTable();
@@ -1929,8 +1828,6 @@ async function exportPDF(){
 
         return {
 
-            width:"*",
-
             table:{
 
                 widths:["*"],
@@ -1944,10 +1841,9 @@ async function exportPDF(){
                                 canvas:[{
                                     type:"rect",
                                     x:0, y:0,
-                                    w:60, h:3,
+                                    w:150, h:3,
                                     color: accentColor
-                                }],
-                                alignment:"center"
+                                }]
                             },
 
                             {
@@ -1955,7 +1851,6 @@ async function exportPDF(){
                                 fontSize:9,
                                 bold:true,
                                 color:"#666666",
-                                alignment:"center",
                                 margin:[0,8,0,4]
                             },
 
@@ -1963,8 +1858,7 @@ async function exportPDF(){
                                 text: `${value} zł`,
                                 fontSize:17,
                                 bold:true,
-                                color:"#1a1a1a",
-                                alignment:"center"
+                                color:"#1a1a1a"
                             }
 
                         ],
@@ -2018,7 +1912,7 @@ async function exportPDF(){
                                 margin:[12,2,0,0],
                                 stack:[
                                     {
-                                        text:"Lubelski Związek Piłki Nożnej",
+                                        text:"LZPN: BIAŁA PODLASKA",
                                         fontSize:15,
                                         bold:true,
                                         color:"#8a6a1a"
@@ -2328,29 +2222,16 @@ window.addEventListener(
             closeDayModal();
         }
 
-        if(e.target === document.getElementById("privacyInfoModal")){
-
-            document.getElementById("privacyInfoModal").classList.remove("active");
-        }
-
     }
 );
 
 leagueSelect.addEventListener(
     "change",
-    ()=>{
-        updateCustomLeagueVisibility();
-        updateAmountPreview();
-    }
+    updateAmountPreview
 );
 
 roleSelect.addEventListener(
     "change",
-    updateAmountPreview
-);
-
-customLeagueRateInput.addEventListener(
-    "input",
     updateAmountPreview
 );
 
@@ -2390,15 +2271,6 @@ document
 
 document
 .getElementById("openImportObsadyBtn")
-.addEventListener(
-    "click",
-    ()=>{
-        document.getElementById("importObsadyModal").classList.add("active");
-    }
-);
-
-document
-.getElementById("openImportObsadyBtnCalendar")
 .addEventListener(
     "click",
     ()=>{
@@ -2536,24 +2408,6 @@ document
         closeOnboardingModal();
     }
 });
-
-document
-.getElementById("openPrivacyInfoBtn")
-.addEventListener(
-    "click",
-    ()=>{
-        document.getElementById("privacyInfoModal").classList.add("active");
-    }
-);
-
-document
-.getElementById("closePrivacyInfoModal")
-.addEventListener(
-    "click",
-    ()=>{
-        document.getElementById("privacyInfoModal").classList.remove("active");
-    }
-);
 
 document
 .getElementById("addMatchUnderCalendarBtn")
