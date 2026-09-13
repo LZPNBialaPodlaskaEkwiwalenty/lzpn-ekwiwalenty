@@ -84,9 +84,44 @@ body{
         circle at 80% 10%,
         rgba(212,175,55,.10),
         transparent 25%
+      ),
+
+      radial-gradient(
+        circle at 50% 95%,
+        rgba(240,207,102,.09),
+        transparent 32%
       );
 
+    background-size:200% 200%;
+
+    animation:backgroundGlowDrift 28s ease-in-out infinite;
+
     z-index:-1;
+}
+
+@keyframes backgroundGlowDrift{
+
+    0%{
+        background-position:20% 15%, 80% 5%, 45% 100%;
+        opacity:.85;
+    }
+
+    50%{
+        background-position:30% 30%, 65% 20%, 60% 85%;
+        opacity:1;
+    }
+
+    100%{
+        background-position:20% 15%, 80% 5%, 45% 100%;
+        opacity:.85;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+
+    .background-glow{
+        animation:none;
+    }
 }
 
 /* =========================
