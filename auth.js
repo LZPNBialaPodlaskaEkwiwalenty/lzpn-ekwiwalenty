@@ -373,10 +373,16 @@ async function handleLoginSubmit(){
 
     const fullName = fullNameInput.value.trim();
     const rawEmail = emailInput.value.trim();
+    const rawUsername = usernameInput.value.trim();
     const username = sanitizeUsername(usernameInput.value);
     const pin = pinInput.value.trim();
 
     clearLoginError();
+
+    if(currentMode === "register" && rawUsername.includes("@")){
+        showLoginError("W polu \"Login\" wpisz krótką nazwę użytkownika (np. jkowalski), nie e-mail. Adres e-mail wpisz w polu \"E-mail\" powyżej.");
+        return;
+    }
 
     if(!username || username.length < 3){
         showLoginError("Login musi mieć min. 3 znaki (litery/cyfry, bez polskich znaków i spacji).");
