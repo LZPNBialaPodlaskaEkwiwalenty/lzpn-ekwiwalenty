@@ -1198,6 +1198,18 @@ tbody tr:hover{
         background:rgba(212,175,55,.1);
     }
 
+    .table-actions-row{
+
+        flex-direction:column;
+    }
+
+    .action-row-btn{
+
+        width:100%;
+        font-size:.9rem;
+        padding:13px 16px;
+    }
+
     .weekdays{
 
         font-size:.75rem;
