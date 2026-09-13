@@ -2258,35 +2258,6 @@ body.modal-open{
     box-shadow:0 10px 25px rgba(212,175,55,.25);
 }
 
-.add-match-from-table-btn{
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-
-    width:100%;
-    margin-top:20px;
-
-    background:linear-gradient(
-        135deg,
-        var(--gold),
-        var(--gold-light)
-    );
-
-    color:#111;
-    font-weight:700;
-
-    padding:14px 20px;
-    border-radius:12px;
-    font-size:1rem;
-}
-
-.add-match-from-table-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 10px 25px rgba(212,175,55,.25);
-}
-
 .onboarding-link-btn{
 
     display:flex;
@@ -2404,23 +2375,29 @@ body.modal-open{
     margin-top:20px;
 }
 
-.table-actions-row .add-match-from-table-btn{
-    margin-top:0;
-}
+.action-row-btn{
 
-.generate-report-btn{
+    flex:1;
 
     display:flex;
     align-items:center;
     justify-content:center;
     gap:8px;
 
-    width:100%;
-    margin-top:14px;
-
-    padding:16px 20px;
+    padding:14px 20px;
     border-radius:12px;
-    font-size:1.05rem;
+    font-size:.95rem;
+    font-weight:700;
+
+    background:#181818;
+    color:white;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.action-row-btn:hover{
+    border-color:var(--gold);
+    color:var(--gold);
+    transform:translateY(-2px);
 }
 
 .move-btn-group{
@@ -2447,20 +2424,6 @@ body.modal-open{
 .move-btn-group .move-btn:disabled{
     opacity:.3;
     cursor:not-allowed;
-}
-
-.import-obsady-btn{
-
-    background:#181818;
-    color:white;
-    border:1px solid rgba(255,255,255,.08);
-}
-
-.import-obsady-btn:hover{
-    border-color:var(--gold);
-    color:var(--gold);
-    box-shadow:none;
-    transform:translateY(-2px);
 }
 
 /* =========================

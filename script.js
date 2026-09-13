@@ -1699,6 +1699,18 @@ function updateStatistics(){
         "unsettledCount"
     ).textContent =
         unsettledCount;
+
+    const avg =
+        monthMatches.length > 0
+            ? Math.round(total / monthMatches.length)
+            : 0;
+
+    const avgEl =
+        document.getElementById("avgAmount");
+
+    if(avgEl){
+        avgEl.textContent = `${avg} zł`;
+    }
 }
 
 /* ======================================
@@ -2271,6 +2283,15 @@ document
 
 document
 .getElementById("openImportObsadyBtn")
+.addEventListener(
+    "click",
+    ()=>{
+        document.getElementById("importObsadyModal").classList.add("active");
+    }
+);
+
+document
+.getElementById("importObsadyUnderCalendarBtn")
 .addEventListener(
     "click",
     ()=>{

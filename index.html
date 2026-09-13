@@ -272,12 +272,17 @@
 
         <div class="table-actions-row calendar-actions-row">
 
-            <button id="addMatchUnderCalendarBtn" class="add-match-from-table-btn">
+            <button id="addMatchUnderCalendarBtn" class="action-row-btn">
                 <i class="fa-solid fa-plus"></i>
                 Dodaj mecz
             </button>
 
-            <button id="pdfBtnUnderCalendar" class="add-match-from-table-btn import-obsady-btn">
+            <button id="importObsadyUnderCalendarBtn" class="action-row-btn">
+                <i class="fa-solid fa-file-import"></i>
+                Importuj z Obsad
+            </button>
+
+            <button id="pdfBtnUnderCalendar" class="action-row-btn">
                 <i class="fa-solid fa-file-pdf"></i>
                 Generuj PDF
             </button>
@@ -342,6 +347,17 @@
             <div>
                 <span>Nierozliczone</span>
                 <h2 id="unsettledCount">0</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+
+            <div>
+                <span>Średnia na mecz</span>
+                <h2 id="avgAmount">0 zł</h2>
             </div>
         </div>
 
@@ -432,22 +448,22 @@
 
         <div class="table-actions-row">
 
-            <button id="addMatchFromTableBtn" class="add-match-from-table-btn">
+            <button id="addMatchFromTableBtn" class="action-row-btn">
                 <i class="fa-solid fa-plus"></i>
                 Dodaj mecz
             </button>
 
-            <button id="openImportObsadyBtn" class="add-match-from-table-btn import-obsady-btn">
+            <button id="openImportObsadyBtn" class="action-row-btn">
                 <i class="fa-solid fa-file-import"></i>
                 Importuj z Obsad
             </button>
 
-        </div>
+            <button id="pdfBtn" class="action-row-btn">
+                <i class="fa-solid fa-file-pdf"></i>
+                Generuj PDF
+            </button>
 
-        <button id="pdfBtn" class="gold-btn generate-report-btn">
-            <i class="fa-solid fa-file-pdf"></i>
-            Generuj raport PDF za ten miesiąc
-        </button>
+        </div>
 
     </section>
 
