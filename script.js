@@ -1696,7 +1696,12 @@ function updateStatistics(){
         monthMatches.length;
 
     document.getElementById(
-        "unsettledCount"
+        "settledMatchCount"
+    ).textContent =
+        monthMatches.length - unsettledCount;
+
+    document.getElementById(
+        "unsettledMatchCount"
     ).textContent =
         unsettledCount;
 

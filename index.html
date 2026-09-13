@@ -334,19 +334,13 @@
             </div>
 
             <div>
-                <span>Liczba meczów</span>
-                <h2 id="matchCount">0</h2>
-            </div>
-        </div>
-
-        <div class="stat-card glass">
-            <div class="stat-icon">
-                <i class="fa-solid fa-hourglass-half"></i>
-            </div>
-
-            <div>
-                <span>Nierozliczone</span>
-                <h2 id="unsettledCount">0</h2>
+                <span>Liczba meczów (rozliczone/nierozliczone)</span>
+                <h2>
+                    <span id="matchCount">0</span>
+                    <span class="match-count-breakdown">
+                        <span id="settledMatchCount" class="count-settled">0</span>/<span id="unsettledMatchCount" class="count-unsettled">0</span>
+                    </span>
+                </h2>
             </div>
         </div>
 
