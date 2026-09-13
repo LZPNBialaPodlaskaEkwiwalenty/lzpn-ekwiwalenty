@@ -217,7 +217,9 @@
 
 <main class="container">
 
-    <!-- KALENDARZ -->
+    <!-- KALENDARZ I STATYSTYKI -->
+
+    <div class="dashboard-columns">
 
     <section class="glass calendar-section">
 
@@ -270,17 +272,12 @@
 
         <div class="table-actions-row calendar-actions-row">
 
-            <button id="addMatchUnderCalendarBtn" class="add-match-from-table-btn action-btn-compact">
+            <button id="addMatchUnderCalendarBtn" class="add-match-from-table-btn">
                 <i class="fa-solid fa-plus"></i>
                 Dodaj mecz
             </button>
 
-            <button id="openImportObsadyBtnCalendar" class="add-match-from-table-btn import-obsady-btn action-btn-compact">
-                <i class="fa-solid fa-file-import"></i>
-                Importuj z Obsad
-            </button>
-
-            <button id="pdfBtnUnderCalendar" class="add-match-from-table-btn import-obsady-btn action-btn-compact">
+            <button id="pdfBtnUnderCalendar" class="add-match-from-table-btn import-obsady-btn">
                 <i class="fa-solid fa-file-pdf"></i>
                 Generuj PDF
             </button>
@@ -349,6 +346,8 @@
         </div>
 
     </section>
+
+    </div>
 
     <!-- FILTRY -->
 
@@ -433,22 +432,22 @@
 
         <div class="table-actions-row">
 
-            <button id="addMatchFromTableBtn" class="add-match-from-table-btn action-btn-compact">
+            <button id="addMatchFromTableBtn" class="add-match-from-table-btn">
                 <i class="fa-solid fa-plus"></i>
                 Dodaj mecz
             </button>
 
-            <button id="openImportObsadyBtn" class="add-match-from-table-btn import-obsady-btn action-btn-compact">
+            <button id="openImportObsadyBtn" class="add-match-from-table-btn import-obsady-btn">
                 <i class="fa-solid fa-file-import"></i>
                 Importuj z Obsad
             </button>
 
-            <button id="pdfBtn" class="add-match-from-table-btn import-obsady-btn action-btn-compact">
-                <i class="fa-solid fa-file-pdf"></i>
-                Generuj PDF
-            </button>
-
         </div>
+
+        <button id="pdfBtn" class="gold-btn generate-report-btn">
+            <i class="fa-solid fa-file-pdf"></i>
+            Generuj raport PDF za ten miesiąc
+        </button>
 
     </section>
 
@@ -493,33 +492,6 @@
                 <label>Klasa rozgrywek</label>
 
                 <select id="league" required></select>
-
-            </div>
-
-            <div class="form-group custom-league-group hidden" id="customLeagueGroup">
-
-                <label>Nazwa rozgrywek (własna)</label>
-
-                <input
-                        type="text"
-                        id="customLeagueName"
-                        placeholder="np. Puchar Polski - eliminacje"
-                >
-
-                <label class="custom-league-rate-label">Twoja stawka (zł)</label>
-
-                <input
-                        type="number"
-                        id="customLeagueRate"
-                        min="0"
-                        step="1"
-                        placeholder="np. 150"
-                >
-
-                <p class="custom-league-hint">
-                    <i class="fa-solid fa-circle-info"></i>
-                    Liga nie została rozpoznana automatycznie - wpisz jej nazwę i własną stawkę ekwiwalentu.
-                </p>
 
             </div>
 
@@ -653,71 +625,7 @@
         Brakuje drużyny na liście?
         <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com?subject=Brakuj%C4%85ca%20dru%C5%BCyna%20w%20aplikacji%20Ekwiwalenty">Zgłoś problem</a>
     </span>
-    <div class="footer-privacy">
-        <i class="fa-solid fa-shield-halved"></i>
-        Twoje dane (login, e-mail, imię i nazwisko oraz historia meczów) są przechowywane w bezpiecznej
-        chmurze (Firebase) oraz lokalnie na Twoim urządzeniu wyłącznie w celu obsługi konta i wyliczania
-        ekwiwalentów. Nie są przekazywane podmiotom trzecim ani wykorzystywane w celach marketingowych.
-        Dane możesz w każdej chwili poprawić lub trwale usunąć w sekcji „Konto".
-        <button type="button" id="openPrivacyInfoBtn" class="footer-privacy-link">
-            Więcej o ochronie danych
-        </button>
-    </div>
 </footer>
-
-<div id="privacyInfoModal" class="modal">
-
-    <div class="modal-content glass">
-
-        <div class="modal-header">
-            <h2><i class="fa-solid fa-shield-halved"></i> Ochrona danych</h2>
-            <button id="closePrivacyInfoModal" aria-label="Zamknij okno ochrony danych">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="privacy-info-content">
-
-            <p>
-                Administratorem danych podanych w aplikacji (login, opcjonalny e-mail, imię i nazwisko
-                sędziego oraz wprowadzone mecze i kwoty ekwiwalentów) jest osoba prowadząca projekt na
-                potrzeby sędziów Lubelskiego Związku Piłki Nożnej.
-            </p>
-
-            <p>
-                <strong>Gdzie przechowywane są dane?</strong><br>
-                Dane konta i mecze są zapisywane w bazie Firebase (Google) w celu synchronizacji między
-                urządzeniami oraz dodatkowo w pamięci lokalnej przeglądarki (localStorage) na potrzeby
-                trybu offline i szybszego działania aplikacji.
-            </p>
-
-            <p>
-                <strong>W jakim celu przetwarzane są dane?</strong><br>
-                Wyłącznie w celu prowadzenia konta, zapisu historii meczów, obliczania ekwiwalentów
-                sędziowskich oraz generowania raportów PDF. E-mail służy jedynie do odzyskiwania dostępu
-                do konta.
-            </p>
-
-            <p>
-                <strong>Komu udostępniane są dane?</strong><br>
-                Dane nie są sprzedawane ani udostępniane podmiotom trzecim w celach marketingowych.
-                Dostęp do nich ma wyłącznie administrator aplikacji, w zakresie niezbędnym do jej
-                utrzymania.
-            </p>
-
-            <p>
-                <strong>Twoje prawa</strong><br>
-                W każdej chwili możesz poprawić swoje dane (imię, e-mail, PIN) lub trwale usunąć konto
-                wraz z wszystkimi zapisanymi meczami w sekcji „Konto" → „Usuń konto". W sprawach
-                dotyczących danych możesz też napisać na adres
-                <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com">lzpnbialapodlaskaekwiwalenty@gmail.com</a>.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
 
 <div id="onboardingModal" class="modal">
 
@@ -903,8 +811,6 @@
             </button>
         </div>
 
-        <div class="account-scroll">
-
         <div class="account-profile-summary">
 
             <div class="account-profile-avatar">
@@ -933,8 +839,6 @@
             </div>
 
         </div>
-
-        <div class="account-grid">
 
         <div class="account-section">
 
@@ -1030,8 +934,6 @@
 
         </div>
 
-        </div>
-
         <div class="account-section danger-zone">
 
             <h3><i class="fa-solid fa-triangle-exclamation"></i> Usuń konto</h3>
@@ -1052,8 +954,6 @@
                 <i class="fa-solid fa-trash"></i>
                 Usuń konto na zawsze
             </button>
-
-        </div>
 
         </div>
 
@@ -1092,41 +992,5 @@
 
 <script src="auth.js"></script>
 <script src="script.js"></script>
-
-<script>
-/* ======================================
-   REJESTRACJA SERVICE WORKERA (PWA)
-   + automatyczne odświeżenie po
-   wgraniu nowej wersji aplikacji,
-   żeby wystarczyło samo odświeżenie
-   strony (bez wylogowywania).
-====================================== */
-if ("serviceWorker" in navigator) {
-
-    window.addEventListener("load", () => {
-
-        navigator.serviceWorker
-            .register("./sw.js")
-            .then((reg) => {
-                reg.update();
-            })
-            .catch((err) => {
-                console.warn("Nie udało się zarejestrować Service Workera:", err);
-            });
-
-    });
-
-    let swRefreshing = false;
-
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-
-        if (swRefreshing) return;
-
-        swRefreshing = true;
-        window.location.reload();
-    });
-}
-</script>
-
 </body>
 </html>
