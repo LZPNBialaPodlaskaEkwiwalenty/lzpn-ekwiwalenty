@@ -350,6 +350,17 @@
             </div>
         </div>
 
+        <div class="stat-card glass stat-card-clickable" id="yearlyStatsBtn">
+            <div class="stat-icon">
+                <i class="fa-solid fa-chart-column"></i>
+            </div>
+
+            <div>
+                <span>Statystyki roczne</span>
+                <h2 class="stat-card-cta">Kliknij i sprawdź</h2>
+            </div>
+        </div>
+
     </section>
 
     </div>
@@ -737,6 +748,25 @@
             <i class="fa-solid fa-check"></i>
             Importuj zaznaczone
         </button>
+
+    </div>
+
+</div>
+
+<div id="yearlyStatsModal" class="modal">
+
+    <div class="modal-content glass teams-admin-modal">
+
+        <div class="modal-header">
+            <h2 id="yearlyStatsTitle">Statystyki roczne</h2>
+            <button id="closeYearlyStatsModal" aria-label="Zamknij statystyki roczne">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p class="teams-admin-count" id="yearlyStatsTotal"></p>
+
+        <div class="pending-teams-list" id="yearlyStatsList"></div>
 
     </div>
 

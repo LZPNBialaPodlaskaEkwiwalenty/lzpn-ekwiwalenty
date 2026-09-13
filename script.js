@@ -1709,6 +1709,82 @@ function updateStatistics(){
 }
 
 /* ======================================
+   STATYSTYKI ROCZNE
+====================================== */
+
+function openYearlyStatsModal(){
+
+    const year = currentYear;
+
+    const yearMatches =
+        matches.filter(m =>
+            new Date(m.date).getFullYear() === year
+        );
+
+    const totalYear =
+        yearMatches.reduce(
+            (sum, m) => sum + m.amount,
+            0
+        );
+
+    document.getElementById("yearlyStatsTitle").textContent =
+        `Statystyki roczne — ${year}`;
+
+    document.getElementById("yearlyStatsTotal").textContent =
+        `Łącznie w ${year} roku: ${totalYear} zł (${yearMatches.length} meczów)`;
+
+    const list =
+        document.getElementById("yearlyStatsList");
+
+    list.innerHTML = "";
+
+    MONTHS.forEach((monthName, index)=>{
+
+        const monthMatches =
+            yearMatches.filter(m =>
+                new Date(m.date).getMonth() === index
+            );
+
+        const monthTotal =
+            monthMatches.reduce(
+                (sum, m) => sum + m.amount,
+                0
+            );
+
+        const row = document.createElement("div");
+        row.className = "pending-team-item";
+
+        row.innerHTML = `
+            <span class="pending-team-name">
+                ${monthName}
+                <span class="pending-team-meta">${monthMatches.length} meczów</span>
+            </span>
+            <span class="yearly-stats-amount">${monthTotal} zł</span>
+        `;
+
+        list.appendChild(row);
+    });
+
+    document.getElementById("yearlyStatsModal").classList.add("active");
+}
+
+document
+.getElementById("yearlyStatsBtn")
+.addEventListener(
+    "click",
+    openYearlyStatsModal
+);
+
+document
+.getElementById("closeYearlyStatsModal")
+.addEventListener(
+    "click",
+    ()=>{
+        document.getElementById("yearlyStatsModal").classList.remove("active");
+    }
+);
+
+/* ======================================
    TOAST
 ====================================== */
 

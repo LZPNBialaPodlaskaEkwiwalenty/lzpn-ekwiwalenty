@@ -416,6 +416,34 @@ button{
     gap:18px;
 }
 
+.stat-card-clickable{
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.stat-card-clickable:hover{
+
+    transform:translateY(-2px);
+    border-color:rgba(212,175,55,.4);
+    box-shadow:0 10px 25px rgba(212,175,55,.1);
+}
+
+.stat-card-cta{
+
+    color:var(--gold-light,#f0cf66) !important;
+    font-size:1.1rem !important;
+    font-weight:700;
+}
+
+.yearly-stats-amount{
+
+    font-weight:700;
+    font-size:.95rem;
+    color:var(--gold-light,#f0cf66);
+    flex-shrink:0;
+}
+
 .stat-icon{
 
     width:60px;
