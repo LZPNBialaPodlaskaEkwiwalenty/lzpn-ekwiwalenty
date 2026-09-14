@@ -649,6 +649,7 @@ function openAddModal(date){
     roleSelect.selectedIndex = 0;
 
     document.getElementById("manualAmount").value = "";
+    document.getElementById("customLeagueName").value = "";
     toggleManualAmountField();
 
     updateAmountPreview();
@@ -680,14 +681,27 @@ function openEditModal(id){
 
     setFormSettled(match.settled);
 
-    leagueSelect.value =
-        match.league;
+    if(match.isCustomLeague){
+
+        leagueSelect.value = CUSTOM_LEAGUE_LABEL;
+
+        document.getElementById("customLeagueName").value =
+            match.league;
+
+        document.getElementById("manualAmount").value =
+            match.amount;
+
+    }else{
+
+        leagueSelect.value =
+            match.league;
+
+        document.getElementById("customLeagueName").value = "";
+        document.getElementById("manualAmount").value = "";
+    }
 
     roleSelect.value =
         match.role;
-
-    document.getElementById("manualAmount").value =
-        match.league === CUSTOM_LEAGUE_LABEL ? match.amount : "";
 
     toggleManualAmountField();
 
@@ -1324,7 +1338,12 @@ function saveMatch(event){
             ).value,
 
         league:
-            leagueSelect.value,
+            leagueSelect.value === CUSTOM_LEAGUE_LABEL
+                ? (document.getElementById("customLeagueName").value.trim() || CUSTOM_LEAGUE_LABEL)
+                : leagueSelect.value,
+
+        isCustomLeague:
+            leagueSelect.value === CUSTOM_LEAGUE_LABEL,
 
         role:
             roleSelect.value,
