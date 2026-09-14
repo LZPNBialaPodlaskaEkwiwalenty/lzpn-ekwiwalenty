@@ -1995,13 +1995,13 @@ async function exportPDF(){
                                 margin:[12,2,0,0],
                                 stack:[
                                     {
-                                        text:"LZPN: BIAŁA PODLASKA",
-                                        fontSize:15,
+                                        text:"LUBELSKI ZWIĄZEK PIŁKI NOŻNEJ",
+                                        fontSize:14,
                                         bold:true,
                                         color:"#8a6a1a"
                                     },
                                     {
-                                        text:"Rozliczenie ekwiwalentów sędziowskich",
+                                        text:"Kalkulator sędziowski — rozliczenie ekwiwalentów",
                                         fontSize:9,
                                         color:"#777777"
                                     }
@@ -2176,9 +2176,9 @@ async function exportPDF(){
 
             {
                 columns:[
-                    summaryCard("ŁĄCZNA WARTOŚĆ", total, "#8a8a8a"),
-                    summaryCard("ROZLICZONE", settled, "#1a8a4a"),
-                    summaryCard("DO WYPŁATY", unpaid, "#d4af37")
+                    { width:"*", ...summaryCard("ŁĄCZNA WARTOŚĆ", total, "#8a8a8a") },
+                    { width:"*", ...summaryCard("ROZLICZONE", settled, "#1a8a4a") },
+                    { width:"*", ...summaryCard("DO WYPŁATY", unpaid, "#d4af37") }
                 ],
 
                 columnGap:14,
