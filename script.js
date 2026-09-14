@@ -2505,6 +2505,7 @@ function startApp(){
     );
 
     maybeShowOnboarding();
+    maybeShowNewDomainNotice();
 }
 
 window.LZPN_AUTH.onReady(startApp);
@@ -2557,6 +2558,22 @@ function maybeShowOnboarding(){
         openOnboardingModal();
     }
 }
+
+function maybeShowNewDomainNotice(){
+
+    const key = "lzpn_new_domain_notice_seen";
+
+    if(!localStorage.getItem(key)){
+        localStorage.setItem(key, "1");
+        document.getElementById("newDomainModal").classList.add("active");
+    }
+}
+
+document
+.getElementById("closeNewDomainModal")
+.addEventListener("click", ()=>{
+    document.getElementById("newDomainModal").classList.remove("active");
+});
 
 document
 .getElementById("openOnboardingBtn")

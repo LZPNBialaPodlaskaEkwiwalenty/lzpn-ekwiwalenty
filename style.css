@@ -1524,6 +1524,51 @@ body.modal-open{
     display:flex;
 }
 
+.new-domain-banner{
+
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px;
+
+    padding:14px 20px;
+
+    border-radius:14px;
+
+    background:rgba(212,175,55,.1);
+    border:1px solid rgba(212,175,55,.35);
+    color:var(--gold-light,#f0cf66);
+
+    font-size:.9rem;
+    line-height:1.4;
+}
+
+.new-domain-banner i{
+    font-size:1.1rem;
+}
+
+.new-domain-banner span{
+    flex:1;
+    color:var(--text);
+}
+
+.new-domain-banner strong{
+    color:var(--gold-light,#f0cf66);
+}
+
+.new-domain-banner-btn{
+
+    padding:8px 16px;
+    border-radius:10px;
+
+    background:linear-gradient(135deg,var(--gold),var(--gold-light));
+    color:#111;
+    font-weight:700;
+    font-size:.85rem;
+    text-decoration:none;
+    white-space:nowrap;
+}
+
 .install-banner{
 
     display:none;

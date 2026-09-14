@@ -217,6 +217,19 @@
 
 <main class="container">
 
+    <!-- INFORMACJA O NOWYM ADRESIE -->
+
+    <div class="new-domain-banner">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>
+            Ta strona przeniosła się pod nowy adres:
+            <strong>kalkulatorlzpn.netlify.app</strong>
+        </span>
+        <a href="https://kalkulatorlzpn.netlify.app/" class="new-domain-banner-btn">
+            Przejdź tam →
+        </a>
+    </div>
+
     <!-- KALENDARZ I STATYSTYKI -->
 
     <div class="dashboard-columns">
@@ -665,6 +678,36 @@
         <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com?subject=Zg%C5%82oszenie%20problemu%20w%20aplikacji%20Kalkulator%20s%C4%99dziowski">Zgłoś problem</a>
     </span>
 </footer>
+
+<div id="newDomainModal" class="modal">
+
+    <div class="modal-content glass" style="max-width:480px; text-align:center;">
+
+        <div class="modal-header" style="justify-content:center; border:none;">
+            <h2>Zmieniliśmy adres!</h2>
+        </div>
+
+        <p style="color:var(--muted); margin:0 0 20px 0; line-height:1.5;">
+            Kalkulator sędziowski działa teraz pod nowym, stałym adresem.
+            Ten link zostanie tu jeszcze jakiś czas, ale docelowo warto
+            już korzystać z nowego.
+        </p>
+
+        <p style="font-size:1.2rem; font-weight:700; color:var(--gold-light,#f0cf66); margin-bottom:24px;">
+            kalkulatorlzpn.netlify.app
+        </p>
+
+        <a href="https://kalkulatorlzpn.netlify.app/" class="gold-btn" style="display:block; text-decoration:none; margin-bottom:12px;">
+            Przejdź na nowy adres →
+        </a>
+
+        <button id="closeNewDomainModal" class="dark-btn" style="width:100%;">
+            Zostań tutaj
+        </button>
+
+    </div>
+
+</div>
 
 <div id="onboardingModal" class="modal">
 
