@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="style.css">
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+
+    <title>Kalkulator sędziowski – LZPN</title>
+
+    <!-- WIDOK "JAK APLIKACJA" PO DODANIU DO EKRANU GŁÓWNEGO -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ekwiwalenty">
+
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- FIREBASE (logowanie i synchronizacja w chmurze) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<div class="background-glow"></div>
+
+<!-- EKRAN ŁADOWANIA -->
+<div id="appLoadingOverlay" class="app-loading active">
+    <img src="logo.png" alt="Logo LZPN" class="app-loading-logo">
+    <div class="app-loading-spinner"></div>
+    <p>Wczytywanie...</p>
+</div>
+
+<!-- EKRAN LOGOWANIA -->
+<div id="loginModal" class="modal">
+
+    <div class="modal-content glass login-content">
+
+        <div class="login-logo">
+            <img src="logo.png" alt="Logo LZPN">
+        </div>
+
+        <h2 id="loginModalTitle">Zaloguj się</h2>
+
+        <div class="login-mode-toggle">
+            <button type="button" id="loginModeBtn" class="toggle-btn mode-btn active">
+                Mam konto
+            </button>
+            <button type="button" id="registerModeBtn" class="toggle-btn mode-btn">
+                Zakładam konto
+            </button>
+        </div>
+
+        <p id="loginSubtitle" class="login-subtitle">
+            Podaj swój login i PIN.
+        </p>
+
+        <div class="form-group" id="fullNameGroup" style="display:none;">
+            <label>Imię i nazwisko</label>
+            <input
+                type="text"
+                id="loginFullName"
+                placeholder="np. Bartosz Zabielski"
+                autocomplete="name"
+            >
+        </div>
+
+        <div class="form-group" id="emailGroup" style="display:none;">
+            <label>E-mail (opcjonalnie)</label>
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="np. jan.kowalski@gmail.com"
+                autocomplete="email"
+            >
+            <p class="field-hint">
+                Możesz zostawić puste, ale bez e-maila nie da się później
+                zresetować zapomnianego PIN-u/hasła — możesz go dopisać
+                w każdej chwili w sekcji "Konto".
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label id="loginUsernameLabel">Login lub e-mail</label>
+            <input
+                type="text"
+                id="loginUsername"
+                placeholder="np. bzabielski"
+                autocomplete="username"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>PIN / Hasło (min. 6 znaków)</label>
+            <input
+                type="password"
+                id="loginPin"
+                placeholder="np. Sedzia2026"
+                autocomplete="current-password"
+                maxlength="24"
+            >
+        </div>
+
+        <div id="loginError" class="login-error"></div>
+
+        <button id="loginSubmitBtn" class="gold-btn login-submit">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Zaloguj
+        </button>
+
+        <button type="button" id="forgotPinBtn" class="forgot-pin-link">
+            Zapomniałeś PIN-u/hasła?
+        </button>
+
+        <p class="adblock-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            Jeśli logowanie albo inna funkcja nie działa, wyłącz blokowanie reklam/skryptów dla tej strony.
+        </p>
+
+    </div>
+
+</div>
+
+<header class="topbar">
+
+    
+    <div class="logo-box">
+        <img src="logo.png" alt="Logo LZPN" class="club-logo">
+        <div>
+            <h1>Kalkulator sędziowski</h1>
+            <span>Lubelski Związek Piłki Nożnej</span>
+        </div>
+    </div>
+
+    <div class="topbar-links">
+        <a href="https://kolegium.lzpn.pl" target="_blank">
+            Strona Kolegium
+        </a>
+
+        <a href="https://kolegium.lzpn.pl/obsada/" target="_blank">
+            Sprawdź obsadę
+        </a>
+
+        <a href="https://lzpn.pl/2026/08/05/tabela-ekwiwalentow-sedziowskich-ks-lzpn-sezon-2026-2027/" target="_blank">
+            Aktualne stawki
+        </a>
+
+        <button type="button" id="openOnboardingBtn" class="onboarding-link-btn">
+            <i class="fa-solid fa-circle-info"></i>
+            Jak szybko dodać mecze?
+        </button>
+    </div>
+</header>
+
+<div class="referee-info glass">
+    <i class="fa-solid fa-user"></i>
+    <span id="refereeNameDisplay">
+        Sędzia: Nie ustawiono
+    </span>
+
+    <span id="currentUserBadge" class="user-badge"></span>
+
+    <button id="changeRefereeBtn" class="dark-btn">
+        <i class="fa-solid fa-gear"></i>
+        Konto
+    </button>
+
+    <button id="adminTeamsPageBtn" class="dark-btn" style="display:none;">
+        <i class="fa-solid fa-shield-halved"></i>
+        Baza drużyn
+    </button>
+
+    <button id="adminUsersPageBtn" class="dark-btn" style="display:none;">
+        <i class="fa-solid fa-users"></i>
+        Użytkownicy
+    </button>
+
+    <button id="logoutBtn" class="dark-btn logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Wyloguj
+    </button>
+</div>
+
+<div id="offlineBanner" class="offline-banner">
+    <i class="fa-solid fa-wifi"></i>
+    Brak połączenia z internetem — dane zapisują się tylko na tym urządzeniu i zsynchronizują się automatycznie, gdy internet wróci.
+</div>
+
+<div id="installBanner" class="install-banner">
+    <i class="fa-solid fa-mobile-screen-button"></i>
+    <span id="installBannerText">
+        Dodaj tę stronę do ekranu głównego, żeby korzystać z niej jak z aplikacji.
+    </span>
+    <button id="installBannerActionBtn" class="dark-btn install-banner-action" style="display:none;">
+        Zainstaluj
+    </button>
+    <button id="installBannerCloseBtn" class="install-banner-close" aria-label="Zamknij podpowiedź">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+</div>
+
+
+<main class="container">
+
+    <!-- KALENDARZ I STATYSTYKI -->
+
+    <div class="dashboard-columns">
+
+    <section class="glass calendar-section">
+
+        <div class="calendar-header">
+
+            <button id="prevMonth">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="calendar-title">
+<div class="selector-group">
+
+    <div class="selector-box">
+
+        <label>MIESIĄC</label>
+
+        <select id="monthSelect"></select>
+
+    </div>
+
+    <div class="selector-box">
+
+        <label>ROK</label>
+
+        <select id="yearSelect"></select>
+
+    </div>
+
+</div>
+
+            </div>
+
+            <button id="nextMonth">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+        <div class="weekdays">
+            <div>Pn</div>
+            <div>Wt</div>
+            <div>Śr</div>
+            <div>Czw</div>
+            <div>Pt</div>
+            <div>Sob</div>
+            <div>Nd</div>
+        </div>
+
+        <div id="calendarGrid" class="calendar-grid"></div>
+
+        <div class="table-actions-row calendar-actions-row">
+
+            <button id="addMatchUnderCalendarBtn" class="action-row-btn">
+                <i class="fa-solid fa-plus"></i>
+                Dodaj mecz
+            </button>
+
+            <button id="importObsadyUnderCalendarBtn" class="action-row-btn">
+                <i class="fa-solid fa-file-import"></i>
+                Importuj z Obsad
+            </button>
+
+            <button id="pdfBtnUnderCalendar" class="action-row-btn">
+                <i class="fa-solid fa-file-pdf"></i>
+                Generuj PDF
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- STATYSTYKI -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <span>Łączna wartość</span>
+                <h2 id="totalAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Rozliczone</span>
+                <h2 id="settledAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+
+            <div>
+                <span>Do wypłaty</span>
+                <h2 id="toPayAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-futbol"></i>
+            </div>
+
+            <div>
+                <span>Liczba meczów</span>
+                <h2 id="matchCount">0</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass">
+            <div class="stat-icon">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+
+            <div>
+                <span>Średnia na mecz</span>
+                <h2 id="avgAmount">0 zł</h2>
+            </div>
+        </div>
+
+        <div class="stat-card glass stat-card-clickable" id="yearlyStatsBtn">
+            <div class="stat-icon">
+                <i class="fa-solid fa-chart-column"></i>
+            </div>
+
+            <div>
+                <span>Statystyki roczne</span>
+                <h2 class="stat-card-cta">Kliknij i sprawdź</h2>
+            </div>
+        </div>
+
+    </section>
+
+    </div>
+
+    <!-- FILTRY -->
+
+    <section class="glass filter-section">
+
+        <div class="filter-title">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Wyszukiwanie
+        </div>
+
+        <div class="filter-grid">
+
+            <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Szukaj drużyny..."
+            >
+
+            <select id="filterLeague">
+                <option value="">Wszystkie rozgrywki</option>
+            </select>
+
+            <select id="filterRole">
+                <option value="">Wszystkie role</option>
+                <option>Sędzia główny</option>
+                <option>Asystent</option>
+            </select>
+
+        </div>
+
+    </section>
+
+    <!-- TABELA -->
+
+    <section class="glass table-section">
+
+        <div class="table-header">
+
+            <h2>
+                <i class="fa-solid fa-list"></i>
+                Mecze w miesiącu
+            </h2>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Data</th>
+                    <th>Rozgrywki</th>
+                    <th>Rola</th>
+                    <th>Gospodarz</th>
+                    <th>Goście</th>
+                    <th>Kwota</th>
+                    <th>Rozliczone</th>
+                    <th>Kolejność</th>
+                    <th>Edytuj</th>
+                    <th>Usuń</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="matchesTableBody">
+
+                <tr>
+                    <td colspan="10" class="empty-row">
+                        Brak meczów w tym miesiącu
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="table-actions-row">
+
+            <button id="addMatchFromTableBtn" class="action-row-btn">
+                <i class="fa-solid fa-plus"></i>
+                Dodaj mecz
+            </button>
+
+            <button id="openImportObsadyBtn" class="action-row-btn">
+                <i class="fa-solid fa-file-import"></i>
+                Importuj z Obsad
+            </button>
+
+            <button id="pdfBtn" class="action-row-btn">
+                <i class="fa-solid fa-file-pdf"></i>
+                Generuj PDF
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- MODAL -->
+
+<div id="matchModal" class="modal">
+
+    <div class="modal-content glass">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Dodaj mecz
+            </h2>
+
+            <button id="closeModal" aria-label="Zamknij okno dodawania meczu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <form id="matchForm">
+
+            <input type="hidden" id="editId">
+
+            <div class="form-group">
+
+                <label>Data meczu</label>
+
+                <input
+                        type="date"
+                        id="matchDate"
+                        required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Klasa rozgrywek</label>
+
+                <select id="league" required></select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Rola</label>
+
+                <select id="role" required>
+
+                    <option value="Sędzia główny">
+                        Sędzia główny
+                    </option>
+
+                    <option value="Asystent">
+                        Asystent
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Drużyna gospodarzy</label>
+
+                <input
+    type="text"
+    id="homeTeam"
+    class="team-search"
+    autocomplete="off"
+    required
+>
+
+<div id="homeTeamSuggestions" class="suggestions"></div>
+
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Drużyna gości</label>
+
+                <input
+    type="text"
+    id="awayTeam"
+    class="team-search"
+    autocomplete="off"
+    required
+>
+
+<div id="awayTeamSuggestions" class="suggestions"></div>
+
+<datalist id="teamsList"></datalist>
+
+<button type="button" id="reportMissingTeamBtn" class="report-team-link">
+    <i class="fa-solid fa-circle-plus"></i>
+    Nie widzisz drużyny na liście? Zgłoś ją
+</button>
+
+            </div>
+
+            <div class="form-group" id="manualAmountGroup" style="display:none;">
+
+                <label>Nazwa ligi / rozgrywek</label>
+
+                <input
+                    type="text"
+                    id="customLeagueName"
+                    placeholder="np. Mecz towarzyski"
+                >
+
+                <label style="margin-top:14px;">Kwota ekwiwalentu (zł)</label>
+
+                <input
+                    type="number"
+                    id="manualAmount"
+                    min="0"
+                    step="1"
+                    placeholder="np. 150"
+                >
+
+            </div>
+
+            <div class="amount-preview" id="amountPreviewBox">
+
+                <span>Ekwiwalent:</span>
+
+                <strong id="calculatedAmount">
+                    0 zł
+                </strong>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Rozliczone</label>
+
+                <div class="settled-toggle">
+
+                    <button
+                        type="button"
+                        id="settledYesBtn"
+                        class="toggle-btn toggle-yes"
+                        onclick="setFormSettled(true)"
+                    >
+                        TAK
+                    </button>
+
+                    <button
+                        type="button"
+                        id="settledNoBtn"
+                        class="toggle-btn toggle-no"
+                        onclick="setFormSettled(false)"
+                    >
+                        NIE
+                    </button>
+
+                </div>
+
+                <input type="hidden" id="settled" value="false">
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                        type="submit"
+                        class="gold-btn"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Zapisz mecz
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- TOAST -->
+
+<div id="toast" class="toast">
+    Operacja zakończona sukcesem
+</div>
+<footer class="footer">
+    © 2026 Bartosz Zabielski – Kalkulator sędziowski<br>
+    Wszelkie prawa zastrzeżone.<br>
+    Projekt i wykonanie: <strong>Bartosz Zabielski</strong><br>
+    <span class="footer-hint">Jeśli logowanie, zapis lub inna funkcja nie działa — wyłącz blokowanie reklam/skryptów dla tej strony.</span><br>
+    <span class="footer-hint">Twoje dane widzisz tylko Ty — logowanie i baza danych każdego sędziego są od siebie odizolowane. <a href="privacy-policy.html">Polityka prywatności</a></span><br>
+    <span class="footer-hint">
+        Coś nie działa?
+        <a href="mailto:lzpnbialapodlaskaekwiwalenty@gmail.com?subject=Zg%C5%82oszenie%20problemu%20w%20aplikacji%20Kalkulator%20s%C4%99dziowski">Zgłoś problem</a>
+    </span>
+</footer>
+
+<div id="onboardingModal" class="modal">
+
+    <div class="modal-content glass onboarding-modal">
+
+        <div class="modal-header">
+            <h2>Jak szybko dodać mecze</h2>
+            <button id="closeOnboardingModal" aria-label="Zamknij instrukcję">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="onboarding-steps">
+
+            <div class="onboarding-step active" data-step="1">
+                <p class="onboarding-step-text">
+                    <strong>Krok 1.</strong> Zaloguj się do Extranetu PZPN, otwórz tabelę
+                    Obsad i zaznacz całe wiersze swoich meczów — od ligi, przez kolejkę,
+                    datę, drużyny, miejsce, aż po wynik.
+                </p>
+                <img src="instr1.png" alt="Zaznaczanie wierszy w tabeli Obsad" class="onboarding-img">
+            </div>
+
+            <div class="onboarding-step" data-step="2">
+                <p class="onboarding-step-text">
+                    <strong>Krok 2.</strong> Skopiuj (Ctrl+C), wejdź w tej aplikacji w
+                    "Importuj z Obsad" (pod tabelą meczów) i wklej (Ctrl+V) do pola tekstowego.
+                </p>
+                <img src="instr2.png" alt="Wklejony tekst w oknie importu" class="onboarding-img">
+            </div>
+
+            <div class="onboarding-step" data-step="3">
+                <p class="onboarding-step-text">
+                    <strong>Krok 3.</strong> Kliknij "Wczytaj mecze" — system sam rozpozna daty,
+                    drużyny i ligi. Sprawdź rolę (Główny/Asystent) przy każdym meczu, popraw
+                    nierozpoznane ligi, i zaimportuj zaznaczone.
+                </p>
+                <img src="instr3.png" alt="Podgląd rozpoznanych meczów przed importem" class="onboarding-img">
+            </div>
+
+        </div>
+
+        <div class="onboarding-nav">
+
+            <button id="onboardingPrevBtn" class="dark-btn" disabled>
+                <i class="fa-solid fa-chevron-left"></i>
+                Wstecz
+            </button>
+
+            <div class="onboarding-dots">
+                <span class="onboarding-dot active" data-dot="1"></span>
+                <span class="onboarding-dot" data-dot="2"></span>
+                <span class="onboarding-dot" data-dot="3"></span>
+            </div>
+
+            <button id="onboardingNextBtn" class="gold-btn">
+                Dalej
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="importObsadyModal" class="modal">
+
+    <div class="modal-content glass import-obsady-modal">
+
+        <div class="modal-header">
+            <h2>Importuj z Obsad</h2>
+            <button id="closeImportObsadyModal" aria-label="Zamknij import">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p class="import-obsady-hint">
+            Zaloguj się do Extranetu PZPN w innej karcie, otwórz tabelę Obsad
+            i zaznacz całe wiersze swoich meczów — od rozgrywek, przez kolejkę,
+            datę, gospodarzy, gości, miejsce, aż po wynik. Skopiuj (Ctrl+C)
+            i wklej tutaj (Ctrl+V).
+        </p>
+
+        <p class="import-obsady-hint">
+            System sam rozpozna daty, drużyny i ligi, a Ty przed importem
+            będziesz mógł wszystko sprawdzić i poprawić.
+        </p>
+
+        <textarea
+            id="importObsadyTextarea"
+            class="import-obsady-textarea"
+            placeholder="Wklej tu skopiowany fragment z Obsad..."
+        ></textarea>
+
+        <button id="parseObsadyBtn" class="gold-btn import-obsady-parse-btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Wczytaj mecze
+        </button>
+
+        <div id="importObsadyPreview" class="import-obsady-preview"></div>
+
+        <button id="confirmImportObsadyBtn" class="gold-btn import-obsady-confirm-btn" style="display:none;">
+            <i class="fa-solid fa-check"></i>
+            Importuj zaznaczone
+        </button>
+
+    </div>
+
+</div>
+
+<div id="yearlyStatsModal" class="modal">
+
+    <div class="modal-content glass teams-admin-modal">
+
+        <div class="modal-header">
+            <h2 id="yearlyStatsTitle">Statystyki roczne</h2>
+            <button id="closeYearlyStatsModal" aria-label="Zamknij statystyki roczne">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p class="teams-admin-count" id="yearlyStatsTotal"></p>
+
+        <div class="pending-teams-list" id="yearlyStatsList"></div>
+
+    </div>
+
+</div>
+
+<div id="usersAdminModal" class="modal">
+
+    <div class="modal-content glass teams-admin-modal">
+
+        <div class="modal-header">
+            <h2>Użytkownicy</h2>
+            <button id="closeUsersAdminModal" aria-label="Zamknij listę użytkowników">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p id="usersAdminCount" class="teams-admin-count"></p>
+
+        <div id="usersAdminList" class="teams-admin-list"></div>
+
+    </div>
+
+</div>
+
+<div id="teamsAdminModal" class="modal">
+
+    <div class="modal-content glass teams-admin-modal">
+
+        <div class="modal-header">
+            <h2>Baza drużyn</h2>
+            <button id="closeTeamsAdminModal" aria-label="Zamknij bazę drużyn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="form-group">
+            <input
+                type="text"
+                id="teamsAdminSearch"
+                placeholder="Szukaj w bazie..."
+            >
+        </div>
+
+        <div class="teams-admin-add-row">
+            <input
+                type="text"
+                id="teamsAdminNewName"
+                placeholder="Nazwa nowej drużyny"
+            >
+            <button id="teamsAdminAddBtn" class="gold-btn">
+                <i class="fa-solid fa-plus"></i>
+                Dodaj
+            </button>
+        </div>
+
+        <p id="teamsAdminCount" class="teams-admin-count"></p>
+
+        <button id="restoreDefaultTeamsBtn" class="dark-btn restore-teams-btn">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Przywróć wbudowaną listę drużyn
+        </button>
+
+        <div id="teamsAdminList" class="teams-admin-list"></div>
+
+    </div>
+
+</div>
+
+<div id="refereeModal" class="modal">
+
+    <div class="modal-content glass account-modal">
+
+        <div class="modal-header">
+            <h2>Twoje konto</h2>
+            <button id="closeAccountModal" aria-label="Zamknij okno konta">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="account-profile-summary">
+
+            <div class="account-profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <div class="account-profile-details">
+
+                <h3 id="accountProfileName">Sędzia</h3>
+
+                <div class="account-profile-row">
+                    <i class="fa-solid fa-at"></i>
+                    <span id="accountProfileLogin">—</span>
+                </div>
+
+                <div class="account-profile-row">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span id="accountProfileEmail">Brak zapisanego e-maila</span>
+                </div>
+
+                <div class="account-profile-row">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span id="accountProfileSince">Konto od: —</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="account-section">
+
+            <h3><i class="fa-solid fa-id-card"></i> Imię i nazwisko</h3>
+
+            <div class="form-group">
+
+                <label>Wyświetlane imię i nazwisko</label>
+
+                <input
+                    type="text"
+                    id="refereeNameInput"
+                    placeholder="np. Bartosz Zabielski"
+                >
+
+            </div>
+
+            <button
+                id="saveRefereeBtn"
+                class="gold-btn"
+            >
+                Zapisz
+            </button>
+
+        </div>
+
+        <div class="account-section">
+
+            <h3><i class="fa-solid fa-envelope"></i> E-mail</h3>
+
+            <p class="danger-text">
+                Potrzebny do "Zapomniałeś PIN-u/hasła?" na ekranie logowania.
+                Zmiana wymaga potwierdzenia linkiem wysłanym na nowy adres.
+            </p>
+
+            <div class="form-group">
+                <label>Nowy e-mail</label>
+                <input
+                    type="email"
+                    id="accountEmailInput"
+                    placeholder="np. jan.kowalski@gmail.com"
+                >
+            </div>
+
+            <div id="accountEmailError" class="login-error"></div>
+
+            <button id="saveAccountEmailBtn" class="gold-btn">
+                Zapisz e-mail
+            </button>
+
+        </div>
+
+        <div class="account-section">
+
+            <h3><i class="fa-solid fa-key"></i> Zmiana PIN-u / hasła</h3>
+
+            <div class="form-group">
+                <label>Aktualny PIN / hasło</label>
+                <input type="password" id="currentPinInput" maxlength="24" placeholder="••••">
+            </div>
+
+            <div class="form-group">
+                <label>Nowy PIN / hasło (min. 6 znaków)</label>
+                <input type="password" id="newPinInput" maxlength="24" placeholder="np. Sedzia2026">
+            </div>
+
+            <div class="form-group">
+                <label>Powtórz nowy PIN / hasło</label>
+                <input type="password" id="newPinConfirmInput" maxlength="24" placeholder="np. Sedzia2026">
+            </div>
+
+            <div id="pinChangeError" class="login-error"></div>
+
+            <button id="changePinBtn" class="dark-btn">
+                <i class="fa-solid fa-key"></i>
+                Zmień PIN
+            </button>
+
+        </div>
+
+        <div id="adminTeamsSection" class="account-section" style="display:none;">
+
+            <h3><i class="fa-solid fa-shield-halved"></i> Zgłoszone drużyny (panel administratora)</h3>
+
+            <p class="danger-text">
+                Widoczne tylko na Twoim koncie. Zaakceptowane drużyny pojawią się
+                na liście wyboru u wszystkich sędziów.
+            </p>
+
+            <div id="pendingTeamsList" class="pending-teams-list">
+                <p class="pending-teams-empty">Brak nowych zgłoszeń.</p>
+            </div>
+
+        </div>
+
+        <div class="account-section danger-zone">
+
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> Usuń konto</h3>
+
+            <p class="danger-text">
+                Usunie login, PIN oraz wszystkie zapisane mecze z chmury.
+                Tej operacji nie można cofnąć.
+            </p>
+
+            <div class="form-group">
+                <label>Potwierdź PIN-em</label>
+                <input type="password" id="deleteAccountPinInput" maxlength="24" placeholder="••••">
+            </div>
+
+            <div id="deleteAccountError" class="login-error"></div>
+
+            <button id="deleteAccountBtn" class="danger-btn">
+                <i class="fa-solid fa-trash"></i>
+                Usuń konto na zawsze
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+
+
+<div id="dayModal" class="day-modal">
+
+    <div class="day-modal-content">
+
+        <button
+            class="close-day-modal"
+            onclick="closeDayModal()"
+        >
+            Wróć
+        </button>
+
+        <h2 id="dayModalDate"></h2>
+
+        <div id="dayMatchesList"></div>
+
+        <button
+            class="add-match-btn"
+            onclick="addMatchFromDay()"
+        >
+            + Dodaj mecz
+        </button>
+
+    </div>
+
+</div>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
