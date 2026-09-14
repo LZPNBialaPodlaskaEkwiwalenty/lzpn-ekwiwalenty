@@ -2176,9 +2176,9 @@ async function exportPDF(){
 
             {
                 columns:[
-                    { width:"*", ...summaryCard("ŁĄCZNA WARTOŚĆ", total, "#8a8a8a") },
-                    { width:"*", ...summaryCard("ROZLICZONE", settled, "#1a8a4a") },
-                    { width:"*", ...summaryCard("DO WYPŁATY", unpaid, "#d4af37") }
+                    { width:160, ...summaryCard("ŁĄCZNA WARTOŚĆ", total, "#8a8a8a") },
+                    { width:160, ...summaryCard("ROZLICZONE", settled, "#1a8a4a") },
+                    { width:160, ...summaryCard("DO WYPŁATY", unpaid, "#d4af37") }
                 ],
 
                 columnGap:14,
