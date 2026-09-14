@@ -1279,6 +1279,9 @@ function toggleManualAmountField(){
 
     document.getElementById("amountPreviewBox").style.display =
         isCustom ? "none" : "flex";
+
+    document.getElementById("customLeagueName").required = isCustom;
+    document.getElementById("manualAmount").required = isCustom;
 }
 
 function updateAmountPreview(){
@@ -1319,6 +1322,14 @@ function saveMatch(event){
         calculateAmount() <= 0
     ){
         alert("Podaj kwotę ekwiwalentu dla tej ligi.");
+        return;
+    }
+
+    if(
+        leagueSelect.value === CUSTOM_LEAGUE_LABEL &&
+        !document.getElementById("customLeagueName").value.trim()
+    ){
+        alert("Podaj nazwę ligi / rozgrywek.");
         return;
     }
 
