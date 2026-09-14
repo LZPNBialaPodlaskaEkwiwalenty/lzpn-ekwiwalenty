@@ -1372,6 +1372,76 @@ tbody tr:hover{
     text-decoration:underline;
 }
 
+/* =========================
+   STRONA POLITYKI PRYWATNOŚCI
+========================= */
+
+.policy-page{
+
+    padding:40px;
+    max-width:900px;
+    margin:0 auto;
+    line-height:1.6;
+}
+
+.policy-page h2{
+
+    color:var(--gold);
+    font-size:1.8rem;
+    margin-bottom:6px;
+}
+
+.policy-updated{
+
+    color:var(--muted);
+    font-size:.85rem;
+    margin-bottom:28px;
+}
+
+.policy-page h3{
+
+    color:var(--gold-light,#f0cf66);
+    font-size:1.1rem;
+    margin-top:28px;
+    margin-bottom:10px;
+}
+
+.policy-page p{
+
+    color:var(--text);
+    font-size:.95rem;
+    margin-bottom:12px;
+}
+
+.policy-page ul{
+
+    color:var(--text);
+    font-size:.95rem;
+    margin:0 0 12px 22px;
+}
+
+.policy-page li{
+
+    margin-bottom:6px;
+}
+
+.policy-page a{
+
+    color:var(--gold-light,#f0cf66);
+}
+
+.policy-disclaimer{
+
+    margin-top:32px;
+    padding:16px 18px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    font-size:.82rem !important;
+    color:var(--muted) !important;
+    font-style:italic;
+}
+
 .footer-hint a:hover{
 
     opacity:.85;
