@@ -9,6 +9,7 @@
 ====================================== */
 
 const STORAGE_KEY = "lzpn_biala_podlaska_ekwiwalenty";
+const CUSTOM_LEAGUE_LABEL = "Inna liga / inna stawka";
 
 function escapeHtml(str){
 
@@ -412,6 +413,25 @@ function initializeSelects(){
     filterLeague.innerHTML =
         '<option value="">Wszystkie rozgrywki</option>';
 
+    const placeholderOption =
+        document.createElement("option");
+
+    placeholderOption.value = "";
+    placeholderOption.textContent = "- wybierz ligę -";
+
+    leagueSelect.appendChild(placeholderOption);
+
+    const customOption =
+        document.createElement("option");
+
+    customOption.value = CUSTOM_LEAGUE_LABEL;
+    customOption.textContent = CUSTOM_LEAGUE_LABEL;
+    customOption.style.fontWeight = "800";
+    customOption.className = "custom-league-option";
+
+    leagueSelect.appendChild(customOption);
+    filterLeague.appendChild(customOption.cloneNode(true));
+
     Object.keys(RATES).forEach(league=>{
 
         const option =
@@ -628,6 +648,9 @@ function openAddModal(date){
     leagueSelect.selectedIndex = 0;
     roleSelect.selectedIndex = 0;
 
+    document.getElementById("manualAmount").value = "";
+    toggleManualAmountField();
+
     updateAmountPreview();
 
     modal.classList.add("active");
@@ -662,6 +685,11 @@ function openEditModal(id){
 
     roleSelect.value =
         match.role;
+
+    document.getElementById("manualAmount").value =
+        match.league === CUSTOM_LEAGUE_LABEL ? match.amount : "";
+
+    toggleManualAmountField();
 
     updateAmountPreview();
 
@@ -1203,6 +1231,16 @@ function calculateAmount(){
     const league =
         leagueSelect.value;
 
+    if(league === CUSTOM_LEAGUE_LABEL){
+
+        const manual =
+            Number(
+                document.getElementById("manualAmount").value
+            );
+
+        return isNaN(manual) ? 0 : manual;
+    }
+
     const role =
         roleSelect.value;
 
@@ -1215,6 +1253,18 @@ function calculateAmount(){
     }
 
     return RATES[league][role] || 0;
+}
+
+function toggleManualAmountField(){
+
+    const isCustom =
+        leagueSelect.value === CUSTOM_LEAGUE_LABEL;
+
+    document.getElementById("manualAmountGroup").style.display =
+        isCustom ? "block" : "none";
+
+    document.getElementById("amountPreviewBox").style.display =
+        isCustom ? "none" : "flex";
 }
 
 function updateAmountPreview(){
@@ -1249,6 +1299,14 @@ function setFormSettled(value){
 function saveMatch(event){
 
     event.preventDefault();
+
+    if(
+        leagueSelect.value === CUSTOM_LEAGUE_LABEL &&
+        calculateAmount() <= 0
+    ){
+        alert("Podaj kwotę ekwiwalentu dla tej ligi.");
+        return;
+    }
 
     const editId =
         document.getElementById("editId").value;
@@ -2310,6 +2368,16 @@ window.addEventListener(
 
 leagueSelect.addEventListener(
     "change",
+    ()=>{
+        toggleManualAmountField();
+        updateAmountPreview();
+    }
+);
+
+document
+.getElementById("manualAmount")
+.addEventListener(
+    "input",
     updateAmountPreview
 );
 
